@@ -1,27 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './NavBar.css';
 
 const NavBar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <nav className="navbar">
-      <div className="nav-container">
-        <ul className="nav-menu">
-          <li className="nav-item">
-            <Link to="/" className="nav-links">Home</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/about" className="nav-links">About</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/contact" className="nav-links">Contact</Link>
-          </li>
-          <li className="nav-item">
-            <a href="https://github.com/ridhamxdev" target="_blank" rel="noopener noreferrer" className="nav-links">GitHub</a>
-          </li>
-          <li className="nav-item">
-            <a href="https://www.linkedin.com/in/ridham-goyal-025b422a0/" target="_blank" rel="noopener noreferrer" className="nav-links">LinkedIn</a>
-          </li>
+      <div className="nav-brand">
+        <Link to="/">Portfolio</Link>
+      </div>
+      <button className={`hamburger ${isOpen ? 'active' : ''}`} onClick={toggleMenu}>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
+        <ul>
+          <li><Link to="/" onClick={toggleMenu}>Home</Link></li>
+          <li><Link to="/about" onClick={toggleMenu}>About</Link></li>
+          <li><Link to="/contact" onClick={toggleMenu}>Contact</Link></li>
+          <li><a href="https://github.com/ridhamxdev" target="_blank" rel="noopener noreferrer" onClick={toggleMenu}>GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/ridham-goyal-025b422a0/" target="_blank" rel="noopener noreferrer" onClick={toggleMenu}>LinkedIn</a></li>
         </ul>
       </div>
     </nav>
