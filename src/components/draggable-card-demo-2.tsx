@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import {
   DraggableCardBody,
   DraggableCardContainer,
@@ -46,9 +47,11 @@ export default function DraggableCardDemo({ projects, resetCounter }: DraggableC
           // className="mx-[-50px]" // Example of negative margin to pull cards closer if in a row
         >
           {project.imageUrl && (
-            <img
+            <Image
               src={project.imageUrl}
               alt={project.title}
+              width={320}
+              height={240}
               className="pointer-events-none relative z-10 h-60 w-full object-cover rounded-t-md"
             />
           )}

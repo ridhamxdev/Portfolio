@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { IconBrandGithub, IconBrandLinkedin, IconHome, IconMessage, IconUser, IconBriefcase } from '@tabler/icons-react';
+import { IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react';
 import ContactContent from '@/components/ContactContent';
 
 interface NavItem {
