@@ -63,61 +63,59 @@ const AboutPage = () => {
   }, []);
   
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
-      <main className="max-w-5xl w-full">
-        {/* About Section Content - Copied from src/app/page.tsx */}
-        <section id="about-standalone" ref={aboutRef} className="py-20 px-4 sm:px-8 md:px-16 lg:px-24"> {/* Assign aboutRef and changed id */}
-          <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen text-white py-12 sm:py-16 md:py-20 relative"> {/* Removed bg-gray-900 */}
+      <main className="max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8"> {/* Main content container with padding */}
+        <section id="about-standalone" ref={aboutRef} className="w-full"> {/* Section uses full width of main */}
+          <div>
             <motion.h2 
-              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-16 relative inline-block gradient-text about-title-scramble"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-10 md:mb-12 relative inline-block gradient-text about-title-scramble" // Adjusted margin
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.5 }} // Trigger when 50% is visible
+              viewport={{ once: true, amount: 0.5 }} 
               transition={{ duration: 0.5 }}
             >
-              {/* Text content will be set by GSAP ScrambleText, or keep it as fallback */}
               About Me 
               <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"></span>
             </motion.h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center"> {/* Adjusted gap */}
               <motion.div
-                initial={{ opacity: 0, x: -50 }} // Increased x offset
+                initial={{ opacity: 0, x: -50 }} 
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.3 }} // Adjust amount if needed
-                transition={{ duration: 0.6, delay: 0.2 }} // Slightly longer duration
+                viewport={{ once: true, amount: 0.3 }} 
+                transition={{ duration: 0.6, delay: 0.2 }} 
               >
                 <motion.p 
-                  className="text-lg sm:text-xl mb-6 text-[var(--text-secondary)] about-p1-scramble"
+                  className="text-lg sm:text-xl mb-6 text-[var(--text-secondary)] leading-relaxed about-p1-scramble font-sans" // Added font-sans
                   initial={{ opacity: 0, x: -50 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: 0.3 }} // Staggered delay
+                  transition={{ duration: 0.6, delay: 0.3 }} 
                 >
                   I&apos;m a full-stack developer passionate about creating elegant, user-centric web experiences. My curiosity-driven journey has led to expertise in technologies like React, Node.js, Python (Django), and various modern databases, allowing me to tackle diverse development challenges.
                 </motion.p>
                 <motion.p 
-                  className="text-lg sm:text-xl mb-6 text-[var(--text-secondary)] about-p2-scramble"
+                  className="text-lg sm:text-xl mb-6 text-[var(--text-secondary)] leading-relaxed about-p2-scramble font-sans" // Added font-sans
                   initial={{ opacity: 0, x: -50 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: 0.45 }} // Further staggered delay
+                  transition={{ duration: 0.6, delay: 0.45 }} 
                 >
                   I translate complex problems into intuitive solutions, as seen in projects like the ML-powered Energence platform, the secure TaskNexus system, and the Authora e-commerce site. I&apos;m committed to continuous learning, exploring new tech, and contributing to the developer community.
                 </motion.p>
                 <motion.p 
-                  className="text-lg sm:text-xl text-[var(--text-secondary)] about-p3-scramble"
+                  className="text-lg sm:text-xl text-[var(--text-secondary)] leading-relaxed about-p3-scramble font-sans" // Added font-sans
                   initial={{ opacity: 0, x: -50 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: 0.6 }} // Further staggered delay
+                  transition={{ duration: 0.6, delay: 0.6 }} 
                 >
                   My goal is to build impactful applications that are both functional and delightful to use. I achieve this through thoughtful design, performance optimization, and a deep understanding of user needs, ensuring every project delivers an exceptional digital experience.
                 </motion.p>
               </motion.div>
               
               <motion.div 
-                className="about-image-container relative" // Added a specific class for potential GSAP targeting
+                className="about-image-container relative mt-10 md:mt-0" // Added margin for mobile stacking
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, amount: 0.5 }}

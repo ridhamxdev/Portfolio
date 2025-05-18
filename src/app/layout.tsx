@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar";
+import SparklesBackground from "@/components/SparklesBackground";
+import { FloatingNav } from "@/components/ui/floating-navbar";
+import { IconHome, IconUser, IconBriefcase } from "@tabler/icons-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +26,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Define navItems for FloatingNav - can be moved to a config file if preferred
+  const navItems = [
+    { name: "Home", link: "/", icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+    { name: "Projects", link: "/projects", icon: <IconBriefcase className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+    { name: "About", link: "/about", icon: <IconUser className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+  ];
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
+        {/* <Navbar /> */}
+        <SparklesBackground />
+        <FloatingNav navItems={navItems} />
         {children}
       </body>
     </html>

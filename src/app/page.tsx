@@ -12,7 +12,8 @@ import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
 import DropAnimation from '../components/DropAnimation';
 import { Zap } from 'lucide-react'; // Assuming Zap is still used by SkillCard or elsewhere
 import { Spotlight } from "@/components/ui/Spotlight";
-import Navbar from "@/components/Navbar"; // Import Navbar
+// import Navbar from "@/components/Navbar"; // Import Navbar
+import Footer from '@/components/Footer';
 // Removed Parisienne font import and instantiation as it was part of a removed feature or not used
 // import { Parisienne } from 'next/font/google'; 
 // const parisienne = Parisienne(...);
@@ -372,138 +373,138 @@ export default function Home() {
     }
   ];
 
+  // const navItems = [ // Removed, now in layout.tsx
+  //   { name: "Home", link: "/", icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+  //   { name: "Projects", link: "/projects", icon: <IconBriefcase className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+  //   { name: "About", link: "/about", icon: <IconUser className="h-4 w-4 text-neutral-500 dark:text-white" /> },
+  // ];
+
   return (
-    <main className="min-h-screen pt-16">
-      <Navbar />
+    <main className="relative bg-black-100 flex justify-center items-center flex-col overflow-hidden mx-auto sm:px-10 px-5">
+      {/* <SparklesBackground /> */}{/* Removed */}
+      <div className="max-w-7xl w-full">
+        {/* <FloatingNav navItems={navItems} /> */}{/* Removed */}
+        {/* <Navbar /> */}
 
-      {/* Global styles for scrollbar hiding and mask */}
-      <style jsx global>{`
-        .skills-scroll-container::-webkit-scrollbar {
-          display: none;
-        }
-        .skills-scroll-container {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
-        }
-      `}</style>
+        {/* Global styles for scrollbar hiding and mask */}
+        <style jsx global>{`
+          .skills-scroll-container::-webkit-scrollbar {
+            display: none;
+          }
+          .skills-scroll-container {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+        `}</style>
 
-      {/* Animated background gradient & Spotlight */}
-      <div className="fixed inset-0 -z-10 ">
-        {/* Spotlight Component */}
-        <Spotlight
-          // className="-top-40 left-0 md:left-60 md:-top-20" // This line is effectively removed by not including it.
-          fill="var(--accent-primary)" /> 
-        {/* Animated Blobs */}
-        <div className="opacity-20">
-          <div className="absolute top-0 -left-4 w-72 h-72 bg-[var(--accent-primary)] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-          <div className="absolute top-0 -right-4 w-72 h-72 bg-[var(--accent-secondary)] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-[var(--accent-primary)] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-        </div>
-      </div>
-      
-      {/* Hero Section */}
-      <section 
-        ref={heroRef} 
-        className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-8 md:px-16 lg:px-24 py-20"
-      >
-        <div className="max-w-6xl w-full mx-auto flex flex-col lg:flex-row items-center justify-between lg:gap-16">
-          <div className="lg:w-1/2 text-center lg:text-left">
-            <motion.div style={{ y }} className="mb-4 inline-block">
-              <span className="hero-intro text-[var(--accent-primary)] font-mono text-sm sm:text-base">Hello, my name is</span>
-            </motion.div>
-            
-            <h1 className="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
-              <span className="hero-name-scramble gradient-text"></span>
-            </h1>
-            
-            <h2 className="hero-subtitle-scramble text-2xl sm:text-3xl md:text-4xl text-[var(--text-secondary)] mb-8 max-w-2xl mx-auto lg:mx-0">
-              {/* Placeholder for scramble - original text will be set by GSAP */}
-            </h2>
-            
-            <div className="hero-cta flex flex-wrap gap-4 justify-center lg:justify-start">
-              <a 
-                href="/projects"
-                className="px-6 py-3 rounded-md bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-secondary)] transition-colors duration-300"
-              >
-                View My Work
-              </a>
-            </div>
-          </div>
-
-          <div className="lg:w-1/2 mt-12 lg:mt-0 flex justify-center items-center">
-            <div className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 relative">
-              <DropAnimation />
-            </div>
+        {/* Animated background gradient & Spotlight */}
+        <div className="fixed inset-0 -z-10 ">
+          {/* Spotlight Component */}
+          <Spotlight
+            // className="-top-40 left-0 md:left-60 md:-top-20" // This line is effectively removed by not including it.
+            fill="var(--accent-primary)" /> 
+          {/* Animated Blobs */}
+          <div className="opacity-20">
+            <div className="absolute top-0 -left-4 w-72 h-72 bg-[var(--accent-primary)] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+            <div className="absolute top-0 -right-4 w-72 h-72 bg-[var(--accent-secondary)] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-[var(--accent-primary)] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
           </div>
         </div>
-      </section>
-      
-      {/* Skills Section */}
-      <section id="skills" className="py-16 md:py-24 bg-[var(--background-alt)] relative px-4 sm:px-8 md:px-16 lg:px-24 overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <motion.h2 
-            className="text-4xl md:text-5xl font-bold mb-12 text-center relative gradient-text"
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            My Skills & Toolkit
-          </motion.h2>
-          
-          <div className="space-y-16">
-            {skillCategories.map((categoryObj, categoryIndex) => (
-              <motion.div 
-                key={categoryObj.category}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.5, delay: categoryIndex * 0.15 }}
-              >
-                <h3 className="text-2xl md:text-3xl font-semibold mb-8 text-center md:text-left text-[var(--accent-secondary)] relative pb-2">
-                  {categoryObj.category}
-                  <span className="absolute bottom-0 left-1/2 md:left-0 transform md:-translate-x-0 -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full"></span>
-                </h3>
-                <motion.div
-                  className="overflow-hidden"
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
-                >
-                  <div 
-                    className="flex overflow-x-auto py-4 gap-4 md:gap-6 pb-6 skills-scroll-container"
-                    style={{
-                      WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
-                      maskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
-                    }}
-                  >
-                    {categoryObj.skills.map((skill, index) => (
-                      <SkillCard 
-                        key={skill.name} 
-                        skill={skill} 
-                        index={index}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
+        
+        {/* Hero Section */}
+        <section 
+          ref={heroRef} 
+          className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-8 md:px-16 lg:px-24 py-20"
+        >
+          <div className="max-w-6xl w-full mx-auto flex flex-col lg:flex-row items-center justify-between lg:gap-16">
+            <div className="lg:w-1/2 text-center lg:text-left">
+              <motion.div style={{ y }} className="mb-4 inline-block">
+                <span className="hero-intro text-[var(--accent-primary)] font-mono text-sm sm:text-base">Hello, my name is</span>
               </motion.div>
-            ))}
+              
+              <h1 className="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
+                <span className="hero-name-scramble gradient-text"></span>
+              </h1>
+              
+              <h2 className="hero-subtitle-scramble font-sans text-2xl sm:text-3xl md:text-4xl text-[var(--text-secondary)] mb-8 max-w-2xl mx-auto lg:mx-0">
+                {/* Placeholder for scramble - original text will be set by GSAP */}
+              </h2>
+              
+              <div className="hero-cta flex flex-wrap gap-4 justify-center lg:justify-start">
+                <a 
+                  href="/projects"
+                  className="px-6 py-3 rounded-md bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-secondary)] transition-colors duration-300"
+                >
+                  View My Work
+                </a>
+              </div>
+            </div>
+
+            <div className="lg:w-1/2 mt-12 lg:mt-0 flex justify-center items-center">
+              <div className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 relative">
+                <DropAnimation />
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
-      
-      {/* Footer Section - Adjusted for compactness and navbar */}
-      <footer className="bg-[var(--background)] text-[var(--text-secondary)] py-8 px-4 sm:px-8 md:px-16 lg:px-24 text-center">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-sm mb-2">
-            &copy; {new Date().getFullYear()} Ridham Goyal. All rights reserved.
-          </p>
-          <p className="text-xs">
-            Crafted with <span className="text-[var(--accent-primary)]">&hearts;</span> and Next.js, Tailwind CSS, Framer Motion, GSAP.
-          </p>
-        </div>
-      </footer>
+        </section>
+        
+        {/* Skills Section */}
+        <section id="skills" className="py-16 md:py-24 bg-[var(--background-alt)] relative px-4 sm:px-8 md:px-16 lg:px-24 overflow-hidden">
+          <div className="max-w-6xl mx-auto">
+            <motion.h2 
+              className="text-4xl md:text-5xl font-bold mb-12 text-center relative gradient-text"
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              My Skills & Toolkit
+            </motion.h2>
+            
+            <div className="space-y-16">
+              {skillCategories.map((categoryObj, categoryIndex) => (
+                <motion.div 
+                  key={categoryObj.category}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.5, delay: categoryIndex * 0.15 }}
+                >
+                  <h3 className="text-2xl md:text-3xl font-semibold mb-8 text-center md:text-left text-[var(--accent-secondary)] relative pb-2">
+                    {categoryObj.category}
+                    <span className="absolute bottom-0 left-1/2 md:left-0 transform md:-translate-x-0 -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full"></span>
+                  </h3>
+                  <motion.div
+                    className="overflow-hidden"
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                  >
+                    <div 
+                      className="flex overflow-x-auto py-4 gap-4 md:gap-6 pb-6 skills-scroll-container"
+                      style={{
+                        WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
+                        maskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
+                      }}
+                    >
+                      {categoryObj.skills.map((skill, index) => (
+                        <SkillCard 
+                          key={skill.name} 
+                          skill={skill} 
+                          index={index}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        <Footer />
+      </div>
 
       {/* GSAP ScrambleTextPlugin CDN - replaced with next/script */}
       {/* <Head>

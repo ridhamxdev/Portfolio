@@ -70,7 +70,7 @@ export default function ProjectsPage() {
   }, []);
 
   return (
-    <div className="pt-24 sm:pt-28 md:pt-32 min-h-screen"> {/* Added padding-top for navbar */}
+    <div className="pt-24 sm:pt-28 md:pt-32 min-h-screen relative"> {/* Added padding-top for navbar and relative */}
       <ProjectsSection projects={projects} isLoading={isLoadingProjects} />
     </div>
   );
