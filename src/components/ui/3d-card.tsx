@@ -25,12 +25,11 @@ type CardItemProps<T extends React.ElementType = "div"> = {
   translateZ?: string | number; // Explicit translateZ for transform
   style?: React.CSSProperties; // Allow incoming style to be passed explicitly
   // Omit own props (as, children, className, style) from the underlying component's props type.
-  // translateZ is not a standard HTML attribute, so no need to omit it from ComponentPropsWithoutRef<T>.
 } & Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className' | 'style'>;
 
 export const CardItem = <T extends React.ElementType = "div">({
   as,
-  children: itemChildren, // Destructure and rename to avoid conflict
+  children: itemChildren,
   className, // Our own className prop, will be processed by cn()
   translateZ,
   style: incomingStyleFromProps, // Explicit style prop from user, can be undefined
