@@ -356,6 +356,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen pt-16">
+      <Navbar />
+
       {/* Global styles for scrollbar hiding and mask */}
       <style jsx global>{`
         .skills-scroll-container::-webkit-scrollbar {

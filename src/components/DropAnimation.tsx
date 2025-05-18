@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import gsap from 'gsap';
 
 const SCATTER_RANGE = { x: 1.5, y: 1.5, z: 0.75 };
-const LERP_SMOOTHNESS_FACTOR = 0.1;
 
 // Interface for Droplet props
 interface DropletProps {
@@ -69,14 +68,15 @@ const Droplet = ({
 
   // For random scatter: Main useEffect to handle scattering or returning
   useEffect(() => {
-    if (!ref.current) return;
+    const currentDropletRef = ref.current; // Capture ref.current at the time of the effect
+    if (!currentDropletRef) return;
 
-    gsap.killTweensOf(ref.current.position); 
+    gsap.killTweensOf(currentDropletRef.position); 
 
     if (isScattered) {
       animateToRandomPoint(); 
     } else {
-      gsap.to(ref.current.position, {
+      gsap.to(currentDropletRef.position, {
         x: originalPositionVec.x,
         y: originalPositionVec.y,
         z: originalPositionVec.z,
@@ -86,10 +86,12 @@ const Droplet = ({
     }
     
     return () => {
-      if (ref.current) { 
-        gsap.killTweensOf(ref.current.position);
+      if (currentDropletRef) { // Use the captured ref value in the cleanup
+        gsap.killTweensOf(currentDropletRef.position);
       }
     };
+    // ref is not directly a dependency, but its current value is used.
+    // originalPositionVec and animateToRandomPoint are stable or memoized.
   }, [isScattered, originalPositionVec, animateToRandomPoint]);
 
   useFrame((state, delta) => {
