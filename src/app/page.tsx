@@ -212,8 +212,8 @@ export default function Home() {
           name: "C/C++",
           icon: (
             <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', alignItems: 'center' }}>
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" width="28" height="28" alt="C" />
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" width="28" height="28" alt="C++" />
+              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" width={28} height={28} alt="C" />
+              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" width={28} height={28} alt="C++" />
             </div>
           ),
           isJsxIcon: true,
@@ -230,8 +230,8 @@ export default function Home() {
           name: "HTML/CSS",
           icon: (
             <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', alignItems: 'center' }}>
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width="28" height="28" alt="HTML5" />
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width="28" height="28" alt="CSS3" />
+              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width={28} height={28} alt="HTML5" />
+              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width={28} height={28} alt="CSS3" />
             </div>
           ),
           isJsxIcon: true,
@@ -336,8 +336,8 @@ export default function Home() {
           name: "Sequelize & MySQL",
           icon: (
             <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', alignItems: 'center' }}>
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sequelize/sequelize-original.svg" width="28" height="28" alt="Sequelize" />
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" width="28" height="28" alt="MySQL" />
+              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sequelize/sequelize-original.svg" width={28} height={28} alt="Sequelize" />
+              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" width={28} height={28} alt="MySQL" />
             </div>
           ),
           isJsxIcon: true,
@@ -349,7 +349,25 @@ export default function Home() {
           icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
           description: "In-memory data store for caching, session management, and message brokering.",
           bgColor: "#DC382D", 
-        }
+        },
+        {
+          name: "TypeScript",
+          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+          description: "Superset of JavaScript adding static types for more robust and maintainable code.",
+          bgColor: "#3178C6",
+        },
+        {
+          name: "SQL/NoSQL",
+          icon: (
+            <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', alignItems: 'center' }}>
+              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original-wordmark.svg" width={28} height={28} alt="MySQL" />
+              <Image src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original-wordmark.svg" width={28} height={28} alt="MongoDB" />
+            </div>
+          ),
+          isJsxIcon: true,
+          description: "Managing and querying relational (SQL) and non-relational (NoSQL) databases.",
+          bgColor: "#00758F",
+        },
       ]
     }
   ];

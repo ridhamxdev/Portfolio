@@ -20,7 +20,7 @@ const Droplet = ({
   args = [0.4, 64, 64],
 }: DropletProps) => {
   const ref = useRef<Mesh>(null);
-  console.log(ref);
+  // console.log(ref); // Removed for production
   const originalPositionVec = useRef(new Vector3(...position)).current;
   
   // For random scatter: Ref to hold the latest isScattered value for GSAP callbacks

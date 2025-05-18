@@ -17,25 +17,45 @@ export const CardBody = ({ children, className }: { children: React.ReactNode; c
   return <div style={style} className={cn("relative", className)}>{children}</div>;
 };
 
-// Placeholder for CardItem - Replace with actual Aceternity UI code
-export const CardItem = ({ 
-  children, 
-  className, 
-  as = "div", 
-  translateZ, 
-  ...props 
-}: { 
-  children: React.ReactNode; 
-  className?: string; 
-  as?: React.ElementType; 
-  translateZ?: string | number; 
-  // Replace [key: string]: any with a more specific type or Omit if no other props are expected
-  // For a placeholder, let's assume it can accept common HTML attributes.
-} & React.HTMLAttributes<HTMLElement>) => {
-  const Component = as;
-  // Basic style for translateZ, actual component will have more sophisticated transform logic
-  const style = translateZ ? { transform: `translateZ(${typeof translateZ === 'number' ? `${translateZ}px` : translateZ})` } : {};
-  return <Component className={cn(className)} style={style} {...props}>{children}</Component>;
+// Define the props for CardItem using generics for the 'as' prop
+type CardItemProps<T extends React.ElementType = "div"> = {
+  as?: T;
+  children: React.ReactNode; // Explicit children prop
+  className?: string; // Explicit className
+  translateZ?: string | number; // Explicit translateZ for transform
+  style?: React.CSSProperties; // Allow incoming style to be passed explicitly
+  // Omit own props (as, children, className, style) from the underlying component's props type.
+  // translateZ is not a standard HTML attribute, so no need to omit it from ComponentPropsWithoutRef<T>.
+} & Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className' | 'style'>;
+
+export const CardItem = <T extends React.ElementType = "div">({
+  as,
+  children: itemChildren, // Destructure and rename to avoid conflict
+  className, // Our own className prop, will be processed by cn()
+  translateZ,
+  style: incomingStyleFromProps, // Explicit style prop from user, can be undefined
+  ...rest // 'rest' will now contain other valid props for Component 'T',
+            // excluding as, children, className, and style, which we handle explicitly.
+}: CardItemProps<T>) => {
+  const Component = as || "div"; // Default to "div" if 'as' is not provided
+  
+  // Combine incoming style with the translateZ transform
+  const baseStyle = incomingStyleFromProps || {};
+  const transformStyle = translateZ ? { transform: `translateZ(${typeof translateZ === 'number' ? `${translateZ}px` : translateZ})` } : {};
+  const finalStyle = { ...baseStyle, ...transformStyle };
+
+  const propsForComponent = {
+    ...rest,
+    className: cn(className),
+    style: finalStyle,
+  };
+
+  return (
+    // @ts-expect-error TODO: Address this complex type issue if it persists with actual Aceternity UI components
+    <Component {...propsForComponent}>
+      {itemChildren} {/* Pass the intended children explicitly */}
+    </Component>
+  );
 };
 
 // Note: You will need to replace the content of this file 
