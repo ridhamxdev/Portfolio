@@ -2,21 +2,97 @@
 
 import { useEffect, useRef, useState } from "react";
 import Head from 'next/head';
-// import Image from "next/image"; // No longer used directly here, can be removed if not used by other components still in this file
+import Image from "next/image";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
 import DropAnimation from '../components/DropAnimation';
-import { Zap } from 'lucide-react'; // Assuming Zap is still used by SkillCard or elsewhere
+// Import Lucide icons - reduced to only Zap as others are replaced or unused
+import { Zap } from 'lucide-react';
 import { Spotlight } from "@/components/ui/Spotlight";
-import Navbar from "@/components/Navbar"; // Import Navbar
-// ProjectsSection and Project interface are no longer needed here
 
 // Register ScrollTrigger plugin
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
 }
+
+// Define Project type for fetched data (matches ProjectCard props and API response)
+interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  imageUrl?: string;
+  demoUrl?: string;
+  sourceUrl?: string;
+}
+
+// Custom components
+const ProjectCard = ({ 
+  title, 
+  description, 
+  tags, 
+  imageUrl = "/project-placeholder.jpg",
+  demoUrl,
+  sourceUrl
+}: {
+  title: string;
+  description: string;
+  tags: string[];
+  imageUrl?: string;
+  demoUrl?: string;
+  sourceUrl?: string;
+}) => {
+  return (
+    <motion.div 
+      className="animated-border rounded-lg overflow-hidden bg-[var(--card-bg)] h-full"
+      whileHover={{ y: -10, transition: { duration: 0.3 } }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="relative h-36 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[var(--card-bg)] z-10"></div>
+        <div className="absolute inset-0 bg-[var(--accent-primary)] opacity-30 mix-blend-overlay"></div>
+        <div className="h-full w-full bg-[var(--card-bg)]"></div>
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-bold mb-2 gradient-text">{title}</h3>
+        <p className="text-[var(--text-secondary)] mb-4">{description}</p>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {tags.map((tag, index) => (
+            <span key={index} className="text-xs px-2 py-1 rounded-full bg-[var(--border-color)] text-[var(--text-secondary)]">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <div className="flex space-x-4">
+          {demoUrl && (
+            <a 
+              href={demoUrl} 
+              className="text-[var(--accent-primary)] hover:text-[var(--accent-secondary)] transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Demo
+            </a>
+          )}
+          {sourceUrl && (
+            <a 
+              href={sourceUrl} 
+              className="text-[var(--accent-primary)] hover:text-[var(--accent-secondary)] transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Source Code
+            </a>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 // SkillCard component (replaces SkillBadge)
 const SkillCard = ({ 
@@ -42,7 +118,7 @@ const SkillCard = ({
   const flipCard = () => setIsFlipped(!isFlipped);
 
   return (
-    <motion.div 
+    <motion.div
       variants={cardVariants}
       initial="initial"
       whileInView="animate"
@@ -117,9 +193,8 @@ export default function Home() {
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], [0, -50]);
   
-  // Removed isNavbarVisible state and related useEffect
-  // const [isNavbarVisible, setIsNavbarVisible] = useState(true); 
-  // const scrollThreshold = 200;
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+  const scrollThreshold = 200; // Pixels to scroll before navbar hides
 
   // useEffect for hero animation (runs once)
   useEffect(() => {
@@ -131,6 +206,7 @@ export default function Home() {
         { opacity: 1, y: 0, duration: 0.8 },
         "0.2"
       )
+      // Scramble animation for hero title (name)
       .to(".hero-name-scramble", {
         duration: 2,
         scrambleText: {
@@ -139,31 +215,62 @@ export default function Home() {
           revealDelay: 0.3,
           speed: 0.05
         }
-      }, "-=0.3")
+      }, "-=0.3") // Start slightly after intro
+      // Scramble animation for hero subtitle
       .to(".hero-subtitle-scramble", {
-        duration: 3.5,
+        duration: 3,
         scrambleText: {
-          text: "I am a versatile full-stack developer, adept at architecting and fabricating extraordinary digital solutions and user-centric online experiences.", 
+          text: "I'm a full-stack developer specializing in building exceptional digital experiences.", 
           chars: "lowerCase", 
-          revealDelay: 0.4,
-          speed: 0.03
+          revealDelay: 0.3, 
+          speed: 0.05
         }
-      }, "-=1.5")
+      }, "-=1.5") // Start during name scramble
       .fromTo(
         ".hero-cta",
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 
-        "-=1.0"
+        "-=1.0" // Overlap with subtitle scramble
       );
 
-    // Removed initial navbar visibility check based on scroll position
+    // Initial check for navbar visibility based on scroll position
+    // This ensures navbar is correctly hidden/shown on page load if already scrolled.
+    if (window.scrollY > scrollThreshold) {
+        setIsNavbarVisible(false);
+      } else {
+        setIsNavbarVisible(true);
+      }
 
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
-  }, []); // Removed scrollThreshold from dependency array
+  }, [scrollThreshold]); // scrollThreshold added as dependency due to its use in initial check
 
-  // Removed useEffect for scroll-dependent navbar visibility
+  // useEffect for scroll-dependent logic (navbar visibility) and data fetching
+  useEffect(() => {
+    const handleNavbarScroll = () => {
+      if (window.scrollY > scrollThreshold) {
+        setIsNavbarVisible(false);
+      } else {
+        setIsNavbarVisible(true);
+      }
+    };
+
+    let timeoutId: NodeJS.Timeout;
+    const debouncedHandler = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleNavbarScroll();
+      }, 50);
+    };
+
+    window.addEventListener('scroll', debouncedHandler);
+    
+    return () => {
+      window.removeEventListener('scroll', debouncedHandler);
+      // Note: ScrollTrigger.getAll().forEach(trigger => trigger.kill()); is in the other useEffect
+    };
+  }, [scrollThreshold]); // Removed projects from dependencies
 
   const skillCategories: SkillCategory[] = [
     {
@@ -321,8 +428,7 @@ export default function Home() {
       <Head>
         <script src="https://unpkg.com/gsap@3/dist/ScrambleTextPlugin.min.js"></script>
       </Head>
-      <Navbar /> {/* Render Navbar here */}
-      <div className="min-h-screen">
+      <div className="min-h-screen pt-16">
         {/* Global styles for scrollbar hiding and mask */}
         <style jsx global>{`
           .skills-scroll-container::-webkit-scrollbar {
@@ -338,6 +444,7 @@ export default function Home() {
         <div className="fixed inset-0 -z-10 ">
           {/* Spotlight Component */}
           <Spotlight
+            // className="-top-40 left-0 md:left-60 md:-top-20" // This line is effectively removed by not including it.
             fill="var(--accent-primary)" /> 
           {/* Animated Blobs */}
           <div className="opacity-20">
@@ -348,10 +455,9 @@ export default function Home() {
         </div>
         
         {/* Hero Section */}
-        {/* pt-16 class removed from main div and applied to sections if needed, as Navbar is fixed */}
         <section 
           ref={heroRef} 
-          className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-8 md:px-16 lg:px-24 py-20 pt-24 sm:pt-28 md:pt-32" // Added padding top to account for navbar
+          className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-8 md:px-16 lg:px-24 py-20"
         >
           <div className="max-w-6xl w-full mx-auto flex flex-col lg:flex-row items-center justify-between lg:gap-16">
             <div className="lg:w-1/2 text-center lg:text-left">
@@ -369,7 +475,7 @@ export default function Home() {
               
               <div className="hero-cta flex flex-wrap gap-4 justify-center lg:justify-start">
                 <a 
-                  href="/projects" // Updated link
+                  href="/projects"
                   className="px-6 py-3 rounded-md bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-secondary)] transition-colors duration-300"
                 >
                   View My Work
@@ -386,7 +492,7 @@ export default function Home() {
         </section>
         
         {/* Skills Section */}
-        <section id="skills" className="py-20 px-4 sm:px-8 md:px-16 lg:px-24 bg-gradient-to-b from-[var(--card-bg)] to-[var(--background)] pt-24 sm:pt-28 md:pt-32">
+        <section id="skills" className="py-20 px-4 sm:px-8 md:px-16 lg:px-24 bg-gradient-to-b from-[var(--card-bg)] to-[var(--background)]">
           <div className="max-w-6xl mx-auto">
             <motion.h2 
               className="text-4xl md:text-5xl font-bold mb-12 text-center relative gradient-text"
@@ -440,10 +546,8 @@ export default function Home() {
           </div>
         </section>
         
-        {/* Projects Section has been removed */}
-        
         {/* Footer */}
-        <footer className="py-12 px-4 sm:px-8 md:px-16 lg:px-24 border-t border-[var(--border-color)] pt-24 sm:pt-28 md:pt-32">
+        <footer className="py-12 px-4 sm:px-8 md:px-16 lg:px-24 border-t border-[var(--border-color)]">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
               <h3 className="text-xl font-bold gradient-text">Ridham Goyal</h3>
@@ -451,21 +555,16 @@ export default function Home() {
             </div>
             
             <div className="flex space-x-6">
-              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors">
+              <a href="https://github.com/ridhamxdev" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                 </svg>
               </a>
               <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="https://www.linkedin.com/in/ridham-goyal-025b422a0/" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
                   <rect x="2" y="9" width="4" height="12"></rect>
                   <circle cx="4" cy="4" r="2"></circle>
-                </svg>
-              </a>
-              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
                 </svg>
               </a>
             </div>

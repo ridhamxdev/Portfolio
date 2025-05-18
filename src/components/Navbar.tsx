@@ -47,7 +47,7 @@ const Navbar = () => {
           {/* Social Links */}
           <div className="hidden md:flex items-center space-x-4">
             <a 
-              href="https://github.com/yourusername" 
+              href="https://github.com/ridhamxdev" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors"
@@ -58,7 +58,7 @@ const Navbar = () => {
               </svg>
             </a>
             <a 
-              href="https://linkedin.com/in/yourusername" 
+              href="https://www.linkedin.com/in/ridham-goyal-025b422a0/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-[var(--text-primary)] hover:text-[var(--accent-primary)] transition-colors"

@@ -4,21 +4,21 @@ import React from 'react';
 import { Mail, Linkedin, Github, Twitter } from 'lucide-react';
 
 const ContactPage = () => {
-  const email = 'your.email@example.com';
+  const email = 'ridham.dev3@example.com';
   const socialLinks = [
     {
       name: 'LinkedIn',
-      url: 'https://linkedin.com/in/yourprofile',
+      url: 'https://www.linkedin.com/in/ridham-goyal-025b422a0/',
       icon: <Linkedin size={24} />,
     },
     {
       name: 'GitHub',
-      url: 'https://github.com/yourusername',
+      url: 'https://github.com/ridhamxdev',
       icon: <Github size={24} />,
     },
     {
       name: 'Twitter',
-      url: 'https://twitter.com/yourusername',
+      url: 'https://x.com/Ridham572806',
       icon: <Twitter size={24} />,
     },
   ];
