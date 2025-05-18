@@ -31,7 +31,7 @@ const ContactPage = () => {
             Get in Touch
           </h1>
           <p className="mt-4 text-lg text-gray-300">
-            I'm always excited to connect and discuss new projects, ideas, or just chat about tech!
+            I&apos;m always excited to connect and discuss new projects, ideas, or just chat about tech!
           </p>
         </header>
 

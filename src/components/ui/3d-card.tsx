@@ -18,7 +18,20 @@ export const CardBody = ({ children, className }: { children: React.ReactNode; c
 };
 
 // Placeholder for CardItem - Replace with actual Aceternity UI code
-export const CardItem = ({ children, className, as = "div", translateZ, ...props }: { children: React.ReactNode; className?: string; as?: React.ElementType; translateZ?: string | number; [key: string]: any; }) => {
+export const CardItem = ({ 
+  children, 
+  className, 
+  as = "div", 
+  translateZ, 
+  ...props 
+}: { 
+  children: React.ReactNode; 
+  className?: string; 
+  as?: React.ElementType; 
+  translateZ?: string | number; 
+  // Replace [key: string]: any with a more specific type or Omit if no other props are expected
+  // For a placeholder, let's assume it can accept common HTML attributes.
+} & React.HTMLAttributes<HTMLElement>) => {
   const Component = as;
   // Basic style for translateZ, actual component will have more sophisticated transform logic
   const style = translateZ ? { transform: `translateZ(${typeof translateZ === 'number' ? `${translateZ}px` : translateZ})` } : {};

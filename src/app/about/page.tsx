@@ -94,7 +94,7 @@ const AboutPage = () => {
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.6, delay: 0.3 }} // Staggered delay
                 >
-                  I'm a full-stack developer passionate about creating elegant, user-centric web experiences. My curiosity-driven journey has led to expertise in technologies like React, Node.js, Python (Django), and various modern databases, allowing me to tackle diverse development challenges.
+                  I&apos;m a full-stack developer passionate about creating elegant, user-centric web experiences. My curiosity-driven journey has led to expertise in technologies like React, Node.js, Python (Django), and various modern databases, allowing me to tackle diverse development challenges.
                 </motion.p>
                 <motion.p 
                   className="text-lg sm:text-xl mb-6 text-[var(--text-secondary)] about-p2-scramble"
@@ -103,7 +103,7 @@ const AboutPage = () => {
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.6, delay: 0.45 }} // Further staggered delay
                 >
-                  I translate complex problems into intuitive solutions, as seen in projects like the ML-powered Energence platform, the secure TaskNexus system, and the Authora e-commerce site. I'm committed to continuous learning, exploring new tech, and contributing to the developer community.
+                  I translate complex problems into intuitive solutions, as seen in projects like the ML-powered Energence platform, the secure TaskNexus system, and the Authora e-commerce site. I&apos;m committed to continuous learning, exploring new tech, and contributing to the developer community.
                 </motion.p>
                 <motion.p 
                   className="text-lg sm:text-xl text-[var(--text-secondary)] about-p3-scramble"
