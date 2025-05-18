@@ -1,8 +1,17 @@
-"use client"; // Remove if data fetching is done in a Server Component way
+"use client";
 
 import { useEffect, useState } from "react";
-import ProjectsSection from "@/components/ProjectsSection";
-import { Project } from "@/components/ProjectCard"; // Assuming Project interface is exported from ProjectCard
+import DraggableCardDemo from "@/components/draggable-card-demo-2";
+
+// Define Project type (copied from ProjectCard.tsx for clarity, or could be imported)
+export interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  imageUrl?: string;
+  demoUrl?: string;
+  sourceUrl?: string;
+}
 
 // Helper function to get the base URL
 const getBaseUrl = () => {
@@ -17,36 +26,10 @@ const getBaseUrl = () => {
   return "http://localhost:3000"; // Default to localhost for local development
 };
 
-// This page will be a Server Component by default if 'use client' is removed.
-// For fetching data in Server Components, you'd typically use async/await directly.
-// However, since ProjectsSection likely expects isLoading, we'll keep client-side fetching for now.
-// Or, adapt ProjectsSection to not require isLoading if data is pre-fetched.
-
-// If we want this to be a true Server Component for data fetching:
-// export default async function ProjectsPage() {
-//   const baseUrl = getBaseUrl();
-//   let projects: Project[] = [];
-//   let isLoading = true; // This would be handled differently or not needed
-//   try {
-//     const response = await fetch(`${baseUrl}/api/projects`, { cache: 'no-store' });
-//     if (!response.ok) {
-//       throw new Error('Failed to fetch projects');
-//     }
-//     projects = await response.json();
-//     isLoading = false;
-//   } catch (error) {
-//     console.error("Error fetching projects:", error);
-//     // projects will remain empty, isLoading might be true or handle error display
-//     isLoading = false; // Or set an error state
-//   }
-//   return <ProjectsSection projects={projects} isLoading={false} />; // isLoading would be false as data is resolved
-// }
-
-
-// Keeping client-side fetching for now to align with existing ProjectsSection prop 'isLoading'
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const [resetCounter, setResetCounter] = useState(0); // State for triggering reset
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -61,6 +44,7 @@ export default function ProjectsPage() {
         setProjects(data);
       } catch (error) {
         console.error("Error fetching projects:", error);
+        // Optionally set an error state here to display to the user
       } finally {
         setIsLoadingProjects(false);
       }
@@ -69,9 +53,27 @@ export default function ProjectsPage() {
     fetchProjects();
   }, []);
 
+  const handleRecenterCards = () => {
+    setResetCounter(prev => prev + 1);
+  };
+
+  if (isLoadingProjects) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Loading projects...
+      </div>
+    );
+  }
+
   return (
-    <div className="pt-24 sm:pt-28 md:pt-32 min-h-screen relative"> {/* Added padding-top for navbar and relative */}
-      <ProjectsSection projects={projects} isLoading={isLoadingProjects} />
+    <div className="relative min-h-screen">
+      <DraggableCardDemo projects={projects} resetCounter={resetCounter} />
+      <button 
+        onClick={handleRecenterCards}
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-105 active:scale-95"
+      >
+        Recenter Cards
+      </button>
     </div>
   );
 } 
