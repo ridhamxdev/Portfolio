@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+body {
+  font-family: var(--font-inter); /* Default body font */
+}
+
+h1, .crazy-title {
+  font-family: var(--font-press-start-2p); /* Apply crazy font to H1 and elements with .crazy-title */
+  /* Add other unique styles here */
+  color: lime;
+  text-shadow: 2px 2px #ff00ff;
+}
