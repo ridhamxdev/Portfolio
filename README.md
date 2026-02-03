@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ridham's Portfolio
 
-## Getting Started
+Welcome to my personal developer portfolio, a showcase of my work in Full Stack Engineering and AI Agent development. This platform is built with modern web technologies to demonstrate high-performance web development, 3D interactivity, and clean UI/UX design.
 
-First, run the development server:
+## 🚀 Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This portfolio is engineered with the latest Next.js ecosystem tools:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router & Turbopack)
+- **Language**: [TypeScript](https://www.typescriptlang.org/) for strict type safety
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) & Vanilla CSS
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) & [GSAP](https://gsap.com/)
+- **3D Graphics**: [Three.js](https://threejs.org/) & [React Three Fiber](https://r3f.docs.pmnd.rs/) with [Drei](https://github.com/pmndrs/drei)
+- **UI Components**: Custom components inspired by Aceternity UI, Lucide Icons
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠 Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Dynamic Project Showcase**: Interactive 3D cards and spotlight effects to present projects.
+- **Responsive Design**: Fully responsive layouts optimized for all devices.
+- **Performance Optimized**: Built with Turbopack for fast HMR and Next.js optimization for production builds.
+- **Modern Aesthetics**: Dark mode focused, glassmorphism, and subtle particle effects.
 
-## Learn More
+## 📂 Featured Projects
 
-To learn more about Next.js, take a look at the following resources:
+### 📡 [Synapse](https://github.com/ridhamxdev/Synapse.git) - Backend
+**High-performance real-time messaging backend.**
+Engineered a robust event-driven backend using **Node.js** and **Socket.io**. Capable of handling sub-millisecond message delivery with custom socket adapters and a **Prisma/MySQL** data layer optimized with composite indexes for rapid history retrieval.
+- *Tech Stack*: Node.js, Socket.io, Prisma, MySQL, Clerk
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🧠 [Energence](https://github.com/ridhamxdev/Energence) - Full Stack
+**AI-driven renewable energy prediction platform.**
+A comprehensive platform leveraging **TensorFlow** models to predict solar and wind power generation. Features a microservices architecture with a decoupled ML inference engine and a **Redis** caching layer to optimize data delivery to the React dashboard.
+- *Tech Stack*: React, Django, TensorFlow, PostgreSQL, Redis
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 💳 [TaskNexus](https://github.com/ridhamxdev/TaskNexus) - Backend
+**Enterprise-grade financial transaction system.**
+A sophisticated **NestJS** backend designing for high-fidelity financial operations. Implements **ACID-compliant** transactions via Sequelize and uses **RabbitMQ** for decoupling notification services, ensuring system resilience and data integrity.
+- *Tech Stack*: NestJS, TypeScript, MySQL, Sequelize, RabbitMQ, Redis
 
-## Deploy on Vercel
+### ♠️ [Poker AI Agent](https://github.com/ridhamxdev/ai-poker-agent.git) - AI Agent
+**Advanced Poker AI with Counterfactual Regret Minimization.**
+A complex AI agent implementing **CFR algorithms** to approximate Nash Equilibrium in imperfect information games. Features real-time opponent modeling and risk management strategies synchronized via web sockets.
+- *Tech Stack*: Node.js, TypeScript, CFR Algorithm, Socket.io
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 🛒 [Authora](https://github.com/ridhamxdev/Authora) - Full Stack
+**Modern e-commerce platform.**
+A fully functional MERN stack solution providing a seamless shopping experience. Built with a component-based architecture and a flexible **ProNoSQL** product schema.
+- *Tech Stack*: MongoDB, Express, React, Node.js
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🏃‍♂️ Running Locally
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ridhamxdev/Portfolio.git
+   cd Portfolio
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to explore the portfolio.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

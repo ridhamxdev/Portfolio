@@ -41,6 +41,7 @@ export const CardItem = <T extends React.ElementType = "div">({
   };
 
   return (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     <Component {...(propsForComponent as any)}>
       {itemChildren}
     </Component>
