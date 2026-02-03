@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Mail, Linkedin, Github, Twitter } from 'lucide-react';
-// import { cn } from "@/lib/utils"; // Removed
+import { cn } from "@/lib/utils";
 import CardSpotlightEffect from "./ui/card-spotlight";
 
 interface ContactContentProps {

@@ -2,10 +2,10 @@
 import React, { useId } from "react";
 import { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container, SingleOrMultiple } from "@tsparticles/engine"; // Type import from @tsparticles/engine
+import type { Container, SingleOrMultiple } from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
 import { cn } from "@/lib/utils";
-import { motion, useAnimationControls } from "framer-motion"; // Changed to framer-motion
+import { motion, useAnimationControls } from "framer-motion";
 
 type ParticlesProps = {
   id?: string;
@@ -37,7 +37,7 @@ export const SparklesCore = (props: ParticlesProps) => {
       setInit(true);
     });
   }, []);
-  const controls = useAnimationControls(); // Changed to useAnimationControls from framer-motion
+  const controls = useAnimationControls();
 
   const particlesLoaded = async (container?: Container) => {
     if (container) {
@@ -65,8 +65,8 @@ export const SparklesCore = (props: ParticlesProps) => {
               },
             },
             fullScreen: {
-              enable: false, // Set to false as we are controlling the container size
-              zIndex: 1,     // zIndex for the canvas itself
+              enable: false,
+              zIndex: 1,
             },
 
             fpsLimit: 120,
@@ -223,14 +223,14 @@ export const SparklesCore = (props: ParticlesProps) => {
               number: {
                 density: {
                   enable: true,
-                  width: 400, // Defines area for density calculation
-                  height: 400, // Defines area for density calculation
+                  width: 400,
+                  height: 400,
                 },
                 limit: {
                   mode: "delete",
                   value: 0,
                 },
-                value: particleDensity || 120, // Default particle count
+                value: particleDensity || 120,
               },
               opacity: {
                 value: {

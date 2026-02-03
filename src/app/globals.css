@@ -28,7 +28,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -46,13 +45,11 @@ body {
   background: var(--accent-secondary);
 }
 
-/* Custom selection */
 ::selection {
   background: var(--accent-primary);
   color: white;
 }
 
-/* Gradient text utility */
 .gradient-text {
   background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
   -webkit-background-clip: text;
@@ -60,7 +57,6 @@ body {
   color: transparent;
 }
 
-/* Animated border utility */
 .animated-border {
   position: relative;
   border: 1px solid var(--border-color);
@@ -84,9 +80,5 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* --background: #0a0a0a; */
-    /* --foreground: #ededed; */
   }
 }
-
-/* Spotlight keyframes are now in tailwind.config.js */

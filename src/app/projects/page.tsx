@@ -1,79 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import DraggableCardDemo from "@/components/draggable-card-demo-2";
-
-// Define Project type (copied from ProjectCard.tsx for clarity, or could be imported)
-export interface Project {
-  title: string;
-  description: string;
-  tags: string[];
-  imageUrl?: string;
-  demoUrl?: string;
-  sourceUrl?: string;
-}
-
-// Helper function to get the base URL
-const getBaseUrl = () => {
-  if (typeof window !== "undefined") {
-    // Client-side
-    return ""; // Relative path for client-side fetch
-  }
-  // Server-side
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  return "http://localhost:3000"; // Default to localhost for local development
-};
+import { useState } from "react";
+import ProjectGrid from "@/components/ProjectGrid";
+import { projects } from "@/data/projects";
+import { motion } from "framer-motion";
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
-  const [resetCounter, setResetCounter] = useState(0); // State for triggering reset
+  const [filter, setFilter] = useState<"All" | "Backend" | "AI Agent">("All");
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setIsLoadingProjects(true);
-        const baseUrl = getBaseUrl();
-        const response = await fetch(`${baseUrl}/api/projects`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch projects');
-        }
-        const data = await response.json();
-        setProjects(data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-        // Optionally set an error state here to display to the user
-      } finally {
-        setIsLoadingProjects(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-
-  const handleRecenterCards = () => {
-    setResetCounter(prev => prev + 1);
-  };
-
-  if (isLoadingProjects) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Loading projects...
-      </div>
-    );
-  }
+  const filteredProjects = filter === "All"
+    ? projects
+    : projects.filter(p => p.role === filter || p.role === "Full Stack");
 
   return (
-    <div className="relative min-h-screen">
-      <DraggableCardDemo projects={projects} resetCounter={resetCounter} />
-      <button 
-        onClick={handleRecenterCards}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-105 active:scale-95"
-      >
-        Recenter Cards
-      </button>
-    </div>
+    <main className="min-h-screen bg-black-100 relative overflow-hidden py-32 px-5">
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-[var(--accent-primary)]/10 to-transparent pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-6">
+            Technical Portfolio
+          </h1>
+          <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto mb-10">
+            A deep dive into system design, architecture, and execution capabilities.
+            Showcasing backend systems and AI flows.
+          </p>
+
+          <div className="flex justify-center gap-4">
+            {(["All", "Backend", "AI Agent"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setFilter(tab)}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${filter === tab
+                  ? "bg-[var(--accent-primary)] text-white shadow-lg shadow-[var(--accent-primary)]/25"
+                  : "bg-white/5 text-[var(--text-secondary)] hover:bg-white/10"
+                  }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        <ProjectGrid projects={filteredProjects} />
+      </div>
+    </main>
   );
-} 
+}

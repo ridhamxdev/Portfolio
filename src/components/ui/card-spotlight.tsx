@@ -63,21 +63,4 @@ export const CardSpotlightEffect = ({
   );
 };
 
-// For the content within the card, the article provides an example.
-// We can adapt this or use it as a guide for how to structure content
-// inside <CardSpotlightEffect> in ContactContent.tsx.
-
-// Example usage from article (adapted):
-// <CardSpotlightEffect>
-//   <span className="mb-4 inline-flex items-center justify-center rounded-md bg-indigo-500 p-2 shadow-lg">
-//     {/* SVG icon here */}
-//   </span>
-//   <h3 className="mb-2 font-medium tracking-tight text-white">Hello!</h3>
-//   <p className="text-sm text-slate-400">
-//     Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit ex
-//     obcaecati natus eligendi delectus, cum deleniti sunt in labore nihil
-//     quod quibusdam expedita nemo.
-//   </p>
-// </CardSpotlightEffect>
-
 export default CardSpotlightEffect; 
