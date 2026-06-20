@@ -1,44 +1,80 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Instrument_Serif, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import SparklesBackground from "@/components/SparklesBackground";
-import { FloatingNav } from "@/components/ui/floating-navbar";
-import { IconHome, IconUser, IconBriefcase } from "@tabler/icons-react";
+import SmoothScroll from "@/components/SmoothScroll";
+import Cursor from "@/components/Cursor";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
+import Background from "@/components/Background";
+import ScrollProgress from "@/components/ScrollProgress";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const instrument = Instrument_Serif({
+  weight: "400",
+  style: ["normal", "italic"],
   subsets: ["latin"],
+  variable: "--font-instrument",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
+  variable: "--font-hanken",
+  display: "swap",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Ridham Goyal | Portfolio",
-  description: "Personal portfolio website showcasing my projects and skills",
+  metadataBase: new URL("https://portfolio-ridham-goyals-projects.vercel.app"),
+  title: "Ridham Goyal — Full-Stack & Systems Engineer",
+  description:
+    "Ridham Goyal builds real-time backends, AI decision engines, and shipped full-stack products. A portfolio of systems engineered for throughput, reliability, and scale.",
+  keywords: [
+    "Ridham Goyal",
+    "Full-stack developer",
+    "Backend engineer",
+    "AI engineer",
+    "Next.js",
+    "Three.js",
+    "portfolio",
+  ],
+  authors: [{ name: "Ridham Goyal" }],
+  openGraph: {
+    title: "Ridham Goyal — Full-Stack & Systems Engineer",
+    description:
+      "Real-time backends, AI decision engines, and shipped full-stack products.",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ridham Goyal — Full-Stack & Systems Engineer",
+    description:
+      "Real-time backends, AI decision engines, and shipped full-stack products.",
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const navItems = [
-    { name: "Home", link: "/", icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" /> },
-    { name: "Projects", link: "/projects", icon: <IconBriefcase className="h-4 w-4 text-neutral-500 dark:text-white" /> },
-    { name: "About", link: "/about", icon: <IconUser className="h-4 w-4 text-neutral-500 dark:text-white" /> },
-  ];
-
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <SparklesBackground />
-        <FloatingNav navItems={navItems} />
-        {children}
+    <html
+      lang="en"
+      className={`${instrument.variable} ${hanken.variable} ${jetbrains.variable}`}
+    >
+      <body className="bg-void text-bone antialiased">
+        <Background />
+        <Cursor />
+        <ScrollProgress />
+        <Nav />
+        <SmoothScroll>
+          {children}
+          <Footer />
+        </SmoothScroll>
       </body>
     </html>
   );

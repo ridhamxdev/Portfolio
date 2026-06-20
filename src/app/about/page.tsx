@@ -1,143 +1,132 @@
-"use client";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Reveal from "@/components/Reveal";
+import Counter from "@/components/Counter";
 
-import React, { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image'; // Import the Next.js Image component
-import gsap from 'gsap'; // Import gsap
-import { ScrollTrigger } from 'gsap/ScrollTrigger'; // Import ScrollTrigger
-import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin'; // Import ScrambleTextPlugin
-
-// Register ScrollTrigger and ScrambleTextPlugin if running in a browser environment
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
-}
-
-const AboutPage = () => {
-  const aboutRef = useRef(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && aboutRef.current) {
-      gsap.to(".about-image-container", {
-        yPercent: -25,
-        ease: "none",
-        scrollTrigger: {
-          trigger: aboutRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true
-        }
-      });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: aboutRef.current,
-          start: "top center+=20%",
-          once: true
-        }
-      });
-
-      tl.to(".about-title-scramble", {
-        duration: 1.5,
-        scrambleText: { text: "About Me", chars: "upperCase", speed: 0.3, revealDelay: 0.5 }
-      })
-        .to(".about-p1-scramble", {
-          duration: 2.5,
-          scrambleText: { text: document.querySelector('.about-p1-scramble')?.textContent || "", chars: "lowerCase", speed: 0.1, revealDelay: 0.2 }
-        }, "-=1.2")
-        .to(".about-p2-scramble", {
-          duration: 3,
-          scrambleText: { text: document.querySelector('.about-p2-scramble')?.textContent || "", chars: "lowerCase", speed: 0.1, revealDelay: 0.3 }
-        }, "-=2.2")
-        .to(".about-p3-scramble", {
-          duration: 3.5,
-          scrambleText: { text: document.querySelector('.about-p3-scramble')?.textContent || "", chars: "lowerCase", speed: 0.1, revealDelay: 0.4 }
-        }, "-=2.7");
-
-      return () => {
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-        tl.kill();
-      };
-    }
-  }, []);
-
-  return (
-    <div className="min-h-screen text-white py-12 sm:py-16 md:py-20 relative">
-      <main className="max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <section id="about-standalone" ref={aboutRef} className="w-full">
-          <div>
-            <motion.h2
-              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-10 md:mb-12 relative inline-block gradient-text about-title-scramble"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.5 }}
-            >
-              About Me
-              <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"></span>
-            </motion.h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <motion.p
-                  className="text-lg sm:text-xl mb-6 text-[var(--text-secondary)] leading-relaxed about-p1-scramble font-sans"
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                >
-                  I&apos;m a full-stack developer passionate about creating elegant, user-centric web experiences. My curiosity-driven journey has led to expertise in technologies like React, Node.js, Python (Django), and various modern databases, allowing me to tackle diverse development challenges.
-                </motion.p>
-                <motion.p
-                  className="text-lg sm:text-xl mb-6 text-[var(--text-secondary)] leading-relaxed about-p2-scramble font-sans"
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: 0.45 }}
-                >
-                  I translate complex problems into intuitive solutions, as seen in projects like the ML-powered Energence platform, the secure TaskNexus system, and the Authora e-commerce site. I&apos;m committed to continuous learning, exploring new tech, and contributing to the developer community.
-                </motion.p>
-                <motion.p
-                  className="text-lg sm:text-xl text-[var(--text-secondary)] leading-relaxed about-p3-scramble font-sans"
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                >
-                  My goal is to build impactful applications that are both functional and delightful to use. I achieve this through thoughtful design, performance optimization, and a deep understanding of user needs, ensuring every project delivers an exceptional digital experience.
-                </motion.p>
-              </motion.div>
-
-              <motion.div
-                className="about-image-container relative mt-10 md:mt-0"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                <div className="absolute inset-0 border-2 border-[var(--accent-primary)] rounded-lg transform translate-x-4 translate-y-4"></div>
-                <div className="w-full h-80 bg-[var(--card-bg)] rounded-lg relative overflow-hidden shadow-2xl">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] opacity-20"></div>
-
-                  <Image
-                    src="/profile-photo.jpg"
-                    alt="Ridham Goyal - Profile Photo"
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-lg"
-                  />
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
+export const metadata: Metadata = {
+  title: "About — Ridham Goyal",
+  description:
+    "Ridham Goyal is a full-stack and systems engineer who builds real-time backends, AI decision engines, and shipped products.",
 };
 
-export default AboutPage;
+const principles = [
+  {
+    title: "The backend is the product",
+    body: "The polish people feel — instant, reliable, never-loses-your-data — is usually a backend decision. I design the data layer and the failure modes first.",
+  },
+  {
+    title: "Ship it, then prove it",
+    body: "A project isn't done until it's deployed and someone can click it. Eight of mine are live right now, not screenshots in a README.",
+  },
+  {
+    title: "Decisions, not just CRUD",
+    body: "The work I care about most is systems that decide — game-theory agents, ML forecasts, LLM features wired into real flows.",
+  },
+  {
+    title: "Boring where it counts",
+    body: "ACID transactions, queues, indexes, caches. Unglamorous primitives, used well, are what hold up when traffic shows up.",
+  },
+];
+
+export default function AboutPage() {
+  return (
+    <main className="relative z-10 mx-auto max-w-[1400px] px-5 pb-32 pt-36 sm:px-8">
+      <Reveal>
+        <p className="eyebrow mb-6">[ About ]</p>
+        <h1 className="display-lg max-w-4xl text-balance">
+          I&apos;m Ridham — I gravitate to the{" "}
+          <span className="font-display italic accent-text">hard parts</span> of
+          software.
+        </h1>
+      </Reveal>
+
+      <div className="mt-20 grid gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+        {/* photo */}
+        <Reveal>
+          <div className="group relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-3xl border border-line lg:sticky lg:top-28 lg:mx-0">
+            <Image
+              src="/profile-photo.jpg"
+              alt="Ridham Goyal"
+              fill
+              sizes="(max-width: 1024px) 100vw, 480px"
+              className="object-cover object-[68%_center] grayscale transition-all duration-700 group-hover:grayscale-0"
+              priority
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-accent/25 via-transparent to-cool/15 mix-blend-soft-light" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/70 via-transparent to-transparent" />
+            <div className="absolute bottom-5 left-5 font-mono text-[0.65rem] uppercase tracking-[0.18em] text-bone">
+              Ridham Goyal — Bengaluru, IN
+            </div>
+          </div>
+        </Reveal>
+
+        {/* bio */}
+        <Reveal delay={0.1}>
+          <div className="space-y-6 text-lg leading-relaxed text-muted">
+            <p>
+              I&apos;m a full-stack developer who spends most of my time where the
+              hard problems live — real-time backends, event-driven
+              architectures, and the AI systems that have to actually make a
+              call. I like building the parts of an app that users never see but
+              always feel.
+            </p>
+            <p>
+              That&apos;s meant building and shipping <span className="text-bone">EnamDoc</span>{" "}
+              — a dental platform now in production with real users — solo, end
+              to end, SEO and all. And before it: a real-time messaging engine on
+              Socket.io, a NestJS transaction backend with queues and ACID
+              guarantees, a poker agent that uses counterfactual regret
+              minimization, and an ML platform that forecasts renewable energy
+              from live weather. The throughline is the same: design the data and
+              the failure modes first, then build up.
+            </p>
+            <p>
+              I work mostly in the TypeScript and Python ecosystems — Next.js,
+              NestJS, React on top; Postgres, Redis, RabbitMQ, Prisma, and
+              Docker underneath. When something needs to think, that&apos;s where
+              TensorFlow, Gemini, and a bit of game theory come in.
+            </p>
+
+            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line">
+              {[
+                ["16", "Projects shipped"],
+                ["10", "Live deployments"],
+                ["TS / PY", "Primary stacks"],
+                ["2026", "Open to work"],
+              ].map(([v, l]) => (
+                <div key={l} className="bg-void p-6">
+                  <Counter value={v} className="font-display text-3xl text-bone" />
+                  <div className="mt-1 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted">
+                    {l}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </div>
+
+      {/* principles */}
+      <section className="mt-32">
+        <Reveal>
+          <p className="eyebrow mb-5">[ How I work ]</p>
+          <h2 className="display-lg max-w-3xl text-balance">
+            Four things I keep coming <span className="font-display italic accent-text">back to</span>.
+          </h2>
+        </Reveal>
+
+        <div className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2">
+          {principles.map((p, i) => (
+            <Reveal key={p.title} delay={(i % 2) * 0.08} className="bg-void">
+              <div className="flex h-full flex-col gap-4 bg-surface/30 p-8 transition-colors duration-500 hover:bg-surface/70 lg:p-10">
+                <span className="font-mono text-xs text-faint">0{i + 1}</span>
+                <h3 className="font-display text-2xl text-bone sm:text-3xl">{p.title}</h3>
+                <p className="leading-relaxed text-muted">{p.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}

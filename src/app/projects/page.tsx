@@ -1,54 +1,27 @@
-"use client";
+import type { Metadata } from "next";
+import ProjectsExplorer from "@/components/ProjectsExplorer";
 
-import { useState } from "react";
-import ProjectGrid from "@/components/ProjectGrid";
-import { projects } from "@/data/projects";
-import { motion } from "framer-motion";
+export const metadata: Metadata = {
+  title: "Work — Ridham Goyal",
+  description:
+    "A 3D index of shipped projects: real-time backends, AI decision engines, and full-stack products with live deployments.",
+};
 
 export default function ProjectsPage() {
-  const [filter, setFilter] = useState<"All" | "Backend" | "AI Agent">("All");
-
-  const filteredProjects = filter === "All"
-    ? projects
-    : projects.filter(p => p.role === filter || p.role === "Full Stack");
-
   return (
-    <main className="min-h-screen bg-black-100 relative overflow-hidden py-32 px-5">
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-[var(--accent-primary)]/10 to-transparent pointer-events-none" />
+    <main className="relative z-10 mx-auto max-w-[1400px] px-5 pb-32 pt-36 sm:px-8">
+      <header className="mb-12 max-w-3xl">
+        <p className="eyebrow mb-6">[ The work — 16 projects ]</p>
+        <h1 className="display-lg text-balance">
+          Systems, shipped and <span className="font-display italic accent-text">live</span>.
+        </h1>
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+          Drag through the gallery to browse, or scan the full index below. Ten
+          of these are deployed and clickable right now.
+        </p>
+      </header>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-6">
-            Technical Portfolio
-          </h1>
-          <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto mb-10">
-            A deep dive into system design, architecture, and execution capabilities.
-            Showcasing backend systems and AI flows.
-          </p>
-
-          <div className="flex justify-center gap-4">
-            {(["All", "Backend", "AI Agent"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setFilter(tab)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${filter === tab
-                  ? "bg-[var(--accent-primary)] text-white shadow-lg shadow-[var(--accent-primary)]/25"
-                  : "bg-white/5 text-[var(--text-secondary)] hover:bg-white/10"
-                  }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        <ProjectGrid projects={filteredProjects} />
-      </div>
+      <ProjectsExplorer />
     </main>
   );
 }

@@ -1,161 +1,198 @@
-"use client";
-
-import { useParams } from "next/navigation";
-import { projects } from "@/data/projects";
-import { motion } from "framer-motion";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Github, ExternalLink, Cpu, Server, Network } from "lucide-react";
-import React from "react";
+import Image from "next/image";
+import { ArrowLeft, ArrowUpRight, Github, Check } from "lucide-react";
+import { projects } from "@/data/projects";
+import Reveal from "@/components/Reveal";
 
-export default function ProjectDetail() {
-    const { slug } = useParams();
-    const project = projects.find((p) => p.slug === slug);
+export function generateStaticParams() {
+  return projects.map((p) => ({ slug: p.slug }));
+}
 
-    if (!project) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-black-100 text-white">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-4">Project Not Found</h2>
-                    <Link href="/projects" className="text-[var(--accent-primary)] hover:underline">
-                        Return to Projects
-                    </Link>
-                </div>
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const project = projects.find((p) => p.slug === slug);
+  if (!project) return { title: "Not found" };
+  return {
+    title: `${project.title} — Ridham Goyal`,
+    description: project.summary,
+  };
+}
+
+export default async function ProjectDetail({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const index = projects.findIndex((p) => p.slug === slug);
+  if (index === -1) notFound();
+  const project = projects[index];
+  const next = projects[(index + 1) % projects.length];
+
+  return (
+    <main className="relative z-10 mx-auto max-w-[1100px] px-5 pb-32 pt-36 sm:px-8">
+      <Link
+        href="/projects"
+        className="group inline-flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted transition-colors hover:text-bone"
+      >
+        <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+        All work
+      </Link>
+
+      {/* header */}
+      <Reveal>
+        <div className="mt-10">
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.18em] text-accent">
+            {project.flagship && "★ Flagship · "}
+            {project.category} · {project.year}
+          </p>
+          <h1 className="mt-4 font-display text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.95] tracking-[-0.02em]">
+            {project.title}
+          </h1>
+          <p className="mt-5 max-w-2xl text-xl leading-snug text-bone/80">
+            {project.tagline}
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            {project.links.demo && (
+              <a
+                href={project.links.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[#160a02] transition-transform hover:scale-[1.03]"
+              >
+                Visit live site
+                <ArrowUpRight size={15} />
+              </a>
+            )}
+            {project.links.repo && (
+              <a
+                href={project.links.repo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-bone transition-colors hover:border-accent hover:text-accent"
+              >
+                <Github size={15} /> Source code
+              </a>
+            )}
+          </div>
+        </div>
+      </Reveal>
+
+      {/* media */}
+      <Reveal delay={0.1}>
+        <div className="relative mt-14 aspect-[16/10] w-full overflow-hidden rounded-3xl border border-line bg-surface">
+          {project.image ? (
+            <Image
+              src={project.image}
+              alt={project.title}
+              fill
+              sizes="(max-width: 1100px) 100vw, 1100px"
+              className="object-cover object-top"
+              priority
+            />
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-gradient-to-br from-surface-2 via-surface to-void">
+              <Github size={40} className="text-faint" />
+              <span className="font-display text-6xl text-bone/15">{project.title}</span>
+              <span className="font-mono text-[0.65rem] uppercase tracking-widest text-faint">
+                {project.links.repo ? "Source-available · no public deploy" : "Private build"}
+              </span>
             </div>
-        );
-    }
+          )}
+        </div>
+      </Reveal>
 
-    return (
-        <main className="min-h-screen bg-black-100 py-32 px-5 relative overflow-x-hidden">
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--accent-primary)]/5 rounded-full blur-[100px] pointer-events-none" />
+      {/* body */}
+      <div className="mt-20 grid gap-14 lg:grid-cols-[1.5fr_1fr]">
+        <Reveal>
+          <div>
+            <p className="eyebrow mb-5">[ Overview ]</p>
+            <p className="text-xl leading-relaxed text-bone/85">{project.description}</p>
 
-            <div className="max-w-5xl mx-auto relative z-10">
-                <Link
-                    href="/projects"
-                    className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-white mb-12 transition-colors"
+            <p className="eyebrow mb-6 mt-14">[ Engineering highlights ]</p>
+            <ul className="space-y-4">
+              {project.highlights.map((h) => (
+                <li key={h} className="flex gap-4">
+                  <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-accent/40 text-accent">
+                    <Check size={12} strokeWidth={2.5} />
+                  </span>
+                  <span className="text-muted">{h}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <aside className="h-fit rounded-2xl border border-line bg-surface/40 p-7 lg:sticky lg:top-28">
+            <p className="eyebrow mb-5">[ Stack ]</p>
+            <div className="flex flex-wrap gap-2">
+              {project.techStack.map((t) => (
+                <span
+                  key={t}
+                  className="rounded-lg border border-line px-3 py-1.5 font-mono text-xs text-bone/80"
                 >
-                    <ArrowLeft size={16} /> Back to Projects
-                </Link>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="mb-16"
-                >
-                    <div className="flex flex-wrap gap-4 mb-6">
-                        <span className="text-sm font-mono py-1 px-3 rounded-full bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30">
-                            {project.role}
-                        </span>
-                    </div>
-
-                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                        {project.title}
-                    </h1>
-
-                    <p className="text-xl text-[var(--text-secondary)] leading-relaxed max-w-3xl mb-8">
-                        {project.fullDescription}
-                    </p>
-
-                    <div className="flex flex-wrap gap-4">
-                        {project.links.repo && (
-                            <a
-                                href={project.links.repo}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all font-medium border border-white/10"
-                            >
-                                <Github size={20} /> Source Code
-                            </a>
-                        )}
-                        {project.links.demo && (
-                            <a
-                                href={project.links.demo}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] text-white transition-all font-medium shadow-lg shadow-[var(--accent-primary)]/25"
-                            >
-                                <ExternalLink size={20} /> Live Demo
-                            </a>
-                        )}
-                    </div>
-                </motion.div>
-
-                <section className="mb-20">
-                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <Cpu className="text-[var(--accent-primary)]" /> Core Technology
-                    </h3>
-                    <div className="flex flex-wrap gap-3">
-                        {project.techStack.map((tech) => (
-                            <span
-                                key={tech}
-                                className="px-4 py-2 bg-[var(--card-bg)] border border-white/10 rounded-lg text-[var(--text-primary)] text-sm"
-                            >
-                                {tech}
-                            </span>
-                        ))}
-                    </div>
-                </section>
-
-                <div className="grid md:grid-cols-2 gap-12 mb-20">
-                    {(project.systemDesign) && (
-                        <motion.section
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            className="bg-[var(--card-bg)] p-8 rounded-2xl border border-white/5"
-                        >
-                            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                                <Server className="text-blue-400" /> System Design
-                            </h3>
-                            <h4 className="text-lg font-semibold text-[var(--accent-primary)] mb-4">
-                                {project.systemDesign.headline}
-                            </h4>
-                            <ul className="space-y-4">
-                                {project.systemDesign.points.map((point, i) => (
-                                    <li key={i} className="flex gap-3 text-[var(--text-secondary)]">
-                                        <span className="text-[var(--accent-primary)] mt-1.5">•</span>
-                                        <span>{point}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </motion.section>
-                    )}
-
-                    {(project.architecture) && (
-                        <motion.section
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            className="bg-[var(--card-bg)] p-8 rounded-2xl border border-white/5"
-                        >
-                            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                                <Network className="text-purple-400" /> Architecture
-                            </h3>
-                            <p className="text-[var(--text-secondary)] leading-relaxed mb-6">
-                                {project.architecture.description}
-                            </p>
-                            <div className="w-full h-48 bg-black/50 rounded-lg border border-white/10 flex items-center justify-center text-[var(--text-muted)] text-sm">
-                                Architecture Diagram Placeholder
-                            </div>
-                        </motion.section>
-                    )}
-                </div>
-
-                <section className="mb-20">
-                    <h3 className="text-2xl font-bold text-white mb-8 border-b border-white/10 pb-4">
-                        Key Features
-                    </h3>
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {project.keyFeatures.map((feature, i) => (
-                            <div key={i} className="bg-[var(--card-bg)] p-6 rounded-xl border border-white/5">
-                                <span className="text-4xl font-bold text-[var(--accent-primary)]/20 mb-4 block">0{i + 1}</span>
-                                <p className="text-[var(--text-primary)] font-medium">{feature}</p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
+                  {t}
+                </span>
+              ))}
             </div>
-        </main>
-    );
+
+            <div className="my-7 hairline" />
+
+            <dl className="space-y-4 font-mono text-xs">
+              <div className="flex justify-between gap-4">
+                <dt className="text-faint uppercase tracking-wider">Domain</dt>
+                <dd className="text-right text-bone">{project.category}</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-faint uppercase tracking-wider">Year</dt>
+                <dd className="text-bone">{project.year}</dd>
+              </div>
+              {project.facts ? (
+                project.facts.map((f) => (
+                  <div key={f.label} className="flex justify-between gap-4">
+                    <dt className="text-faint uppercase tracking-wider">{f.label}</dt>
+                    <dd className="text-right text-bone">{f.value}</dd>
+                  </div>
+                ))
+              ) : (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-faint uppercase tracking-wider">Status</dt>
+                  <dd className={project.links.demo ? "text-accent" : "text-bone"}>
+                    {project.links.demo ? "Live" : "Source"}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </aside>
+        </Reveal>
+      </div>
+
+      {/* next */}
+      <Link
+        href={`/projects/${next.slug}`}
+        className="group mt-28 flex items-center justify-between border-t border-line pt-10"
+      >
+        <div>
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-faint">
+            Next project
+          </p>
+          <p className="mt-2 font-display text-4xl text-bone transition-colors group-hover:text-accent sm:text-6xl">
+            {next.title}
+          </p>
+        </div>
+        <ArrowUpRight
+          className="h-8 w-8 shrink-0 text-faint transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-accent sm:h-12 sm:w-12"
+          strokeWidth={1.2}
+        />
+      </Link>
+    </main>
+  );
 }
