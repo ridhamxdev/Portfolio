@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Reveal from "@/components/Reveal";
 import RevealHeading from "@/components/RevealHeading";
 
@@ -23,6 +26,32 @@ const groups = [
 ];
 
 export default function Stack() {
+  const root = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    gsap.registerPlugin(ScrollTrigger);
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>(".stack-row").forEach((row) => {
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: row, start: "top 88%" },
+        });
+        tl.from(row.querySelector(".stack-rule"), {
+          scaleX: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          transformOrigin: "left",
+        })
+          .from(
+            row.querySelectorAll(".stack-item"),
+            { y: 26, opacity: 0, duration: 0.6, ease: "power3.out", stagger: 0.04 },
+            "-=0.45"
+          );
+      });
+    }, root);
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section className="mx-auto max-w-[1400px] px-5 py-28 sm:px-8">
       <Reveal>
@@ -32,25 +61,26 @@ export default function Stack() {
         The tools I reach for, by <span className="font-display italic accent-text">layer</span>.
       </RevealHeading>
 
-      <div className="mt-14">
+      <div ref={root} className="mt-14">
         {groups.map((g, i) => (
-          <Reveal key={g.label} delay={i * 0.05}>
-            <div className="grid grid-cols-1 gap-3 border-t border-line py-8 md:grid-cols-[200px_1fr] md:gap-8">
-              <span className="pt-1 font-mono text-xs uppercase tracking-[0.18em] text-faint">
+          <div key={g.label} className="stack-row relative py-8">
+            <span className="stack-rule absolute inset-x-0 top-0 block h-px bg-line-strong" />
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-[200px_1fr] md:gap-8">
+              <span className="stack-item pt-1 font-mono text-xs uppercase tracking-[0.18em] text-faint">
                 {String(i + 1).padStart(2, "0")} / {g.label}
               </span>
               <div className="flex flex-wrap gap-x-6 gap-y-3">
                 {g.items.map((t) => (
                   <span
                     key={t}
-                    className="cursor-default font-display text-2xl text-bone/85 transition-colors duration-300 hover:text-accent sm:text-3xl"
+                    className="stack-item cursor-default font-display text-2xl text-bone/85 transition-colors duration-300 hover:text-accent sm:text-3xl"
                   >
                     {t}
                   </span>
                 ))}
               </div>
             </div>
-          </Reveal>
+          </div>
         ))}
       </div>
     </section>
