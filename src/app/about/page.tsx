@@ -89,8 +89,8 @@ export default function AboutPage() {
 
             <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line">
               {[
-                ["16", "Projects shipped"],
-                ["10", "Live deployments"],
+                ["17", "Projects shipped"],
+                ["11", "Live deployments"],
                 ["TS / PY", "Primary stacks"],
                 ["2026", "Open to work"],
               ].map(([v, l]) => (

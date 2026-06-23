@@ -39,7 +39,7 @@ export default function FeaturedWork() {
             href="/projects"
             className="link-underline hidden shrink-0 font-mono text-xs uppercase tracking-[0.16em] text-muted hover:text-bone sm:block"
           >
-            All 16 projects →
+            All 17 projects →
           </Link>
         </Reveal>
       </div>
@@ -77,7 +77,7 @@ export default function FeaturedWork() {
         href="/projects"
         className="link-underline mt-10 inline-block font-mono text-xs uppercase tracking-[0.16em] text-muted hover:text-bone sm:hidden"
       >
-        All 16 projects →
+        All 17 projects →
       </Link>
 
       {/* cursor-following preview */}

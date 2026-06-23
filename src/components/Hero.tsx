@@ -154,7 +154,7 @@ export default function Hero() {
             <ArrowDown size={13} className="animate-bounce text-accent" />
             Scroll to explore
           </span>
-          <span className="hidden sm:block">16 shipped · 10 live</span>
+          <span className="hidden sm:block">17 shipped · 11 live</span>
         </div>
       </motion.div>
     </section>

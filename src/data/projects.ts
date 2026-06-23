@@ -111,6 +111,35 @@ export const projects: Project[] = [
         },
     },
     {
+        slug: "el-lazina",
+        title: "EL LAZINA",
+        tagline: "A café that sounds like one — cinematic, 3D, built to convert",
+        summary:
+            "A premium, motion-driven site for a culture-led café — open mics, live jamming, in-house production and weekend auto shows — with a Three.js hero, GSAP scroll storytelling and a single conversion-focused path to reserve.",
+        description:
+            "EL LAZINA is a premium concept site for a culture-first café that runs open mics, live jamming, music production and weekend auto shows. The hero is a cinematic, full-bleed slideshow drifting through all four offerings, with floating amber embers rendered in Three.js layered over GSAP-driven headline reveals and Lenis smooth scrolling. An interactive hover showcase steps through the experiences, a scroll-parallax gallery and a cursor-tracking events list build atmosphere, and the whole page funnels to one reserve CTA. Built mobile-first on Next.js with a single content map so every image and section is a one-line swap — shipped live on Vercel as a client pitch.",
+        category: "Full Stack",
+        year: "2026",
+        featured: true,
+        techStack: ["Next.js", "TypeScript", "Three.js", "React Three Fiber", "GSAP", "Lenis", "Tailwind"],
+        highlights: [
+            "Cinematic 3D hero — Three.js embers over a crossfade slideshow",
+            "GSAP ScrollTrigger storytelling with Lenis smooth scroll",
+            "Interactive hover showcase + scroll-parallax gallery",
+            "Conversion-focused: one reserve CTA, fully mobile-first",
+        ],
+        facts: [
+            { label: "Role", value: "Designer & developer" },
+            { label: "Type", value: "Client pitch · concept" },
+            { label: "Focus", value: "3D motion & conversion" },
+        ],
+        image: "/projects/el-lazina.png",
+        links: {
+            demo: "https://el-lazina.vercel.app",
+            repo: "https://github.com/ridhamxdev/el-lazina",
+        },
+    },
+    {
         slug: "intellidash",
         title: "IntelliDash",
         tagline: "Turn any spreadsheet into an analytics product",

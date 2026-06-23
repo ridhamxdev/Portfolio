@@ -9,8 +9,8 @@ import Parallax from "@/components/Parallax";
 import Counter from "@/components/Counter";
 
 const stats = [
-  { value: "16", label: "Projects shipped", drift: 34 },
-  { value: "10", label: "Live deployments", drift: 12 },
+  { value: "17", label: "Projects shipped", drift: 34 },
+  { value: "11", label: "Live deployments", drift: 12 },
   { value: "05", label: "Problem domains", drift: 26 },
   { value: "'26", label: "Open to work", drift: 8 },
 ];
