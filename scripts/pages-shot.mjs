@@ -1,0 +1,15 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+const page = await ctx.newPage();
+page.on("pageerror", e => console.log("PAGEERR:", e.message));
+await page.goto("http://localhost:3000", { waitUntil: "load", timeout: 60000 });
+await page.waitForTimeout(2500);
+await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
+await page.waitForTimeout(1800);
+await page.screenshot({ path: ".verify/footer-horror.png" });
+await page.goto("http://localhost:3000/about", { waitUntil: "load", timeout: 60000 });
+await page.waitForTimeout(2500);
+await page.screenshot({ path: ".verify/about-horror.png" });
+console.log("shots done");
+await browser.close();

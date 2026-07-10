@@ -3,6 +3,8 @@
 import { IconBrandGithub, IconBrandLinkedin, IconBrandX } from "@tabler/icons-react";
 import { ArrowUpRight, ArrowUp } from "lucide-react";
 import Magnetic from "@/components/Magnetic";
+import BloodDrip from "@/components/horror/BloodDrip";
+import { Crossbones } from "@/components/horror/HorrorMotifs";
 
 const socials = [
   { label: "LinkedIn", handle: "/ridham-goyal", href: "https://www.linkedin.com/in/ridham-goyal-025b422a0/", Icon: IconBrandLinkedin },
@@ -13,14 +15,18 @@ const socials = [
 export default function Footer() {
   return (
     <footer id="contact" className="relative z-10 border-t border-line px-5 pb-10 pt-24 sm:px-8">
+      <BloodDrip className="!top-0" />
       <div className="mx-auto max-w-[1400px]">
-        <p className="eyebrow mb-8">[ Currently open to new opportunities ]</p>
+        <p className="eyebrow mb-8 flex items-center gap-3">
+          <Crossbones /> [ Currently open to new opportunities ]
+        </p>
 
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           <h2 className="display-lg max-w-2xl text-balance">
             Let&apos;s build something
             <br />
-            that actually <span className="font-display italic accent-text">ships</span>.
+            that actually{" "}
+            <span className="font-display italic accent-text dread-glow">ships</span>.
           </h2>
 
           <Magnetic className="inline-block self-start lg:self-auto">
