@@ -65,8 +65,8 @@ export default function Hero() {
           className="absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
             background:
-              "radial-gradient(circle, rgba(255,138,61,0.18) 0%, rgba(124,139,255,0.07) 38%, transparent 68%)",
-            filter: "blur(34px)",
+              "radial-gradient(circle, rgba(193,18,31,0.22) 0%, rgba(60,10,14,0.10) 40%, transparent 70%)",
+            filter: "blur(40px)",
           }}
         />
       </div>
@@ -103,8 +103,8 @@ export default function Hero() {
           </span>
           <span className="flex flex-wrap items-baseline overflow-hidden py-[0.06em]">
             <span
-              className="hero-word inline-block italic accent-text"
-              style={{ textShadow: "0 0 48px rgba(255,138,61,0.45)" }}
+              className="hero-word inline-block italic accent-text horror-glitch"
+              style={{ textShadow: "0 0 44px rgba(193,18,31,0.6), 0 0 12px rgba(193,18,31,0.5)" }}
             >
               invisible
             </span>

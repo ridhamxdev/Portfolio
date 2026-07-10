@@ -1,27 +1,28 @@
 @import "tailwindcss";
 
 /*
-  OBSERVATORY — a warm signal in a cold void.
-  Identity: bone-white editorial type + technical mono, over near-black,
-  with a single amber accent that matches the warm key light on the 3D chrome.
+  SÉANCE — a portfolio that watches back.
+  Identity: bone-white editorial type + technical mono, over dead black,
+  a single arterial-red accent, corpse-cold light, film grain, and flicker.
+  A24 psychological-horror restraint — elegant dread, not Halloween kitsch.
 */
 
 @theme {
-  --color-void: #07070b;
-  --color-void-2: #0b0b12;
-  --color-surface: #0e0e16;
-  --color-surface-2: #14141f;
-  --color-line: rgba(236, 233, 224, 0.09);
-  --color-line-strong: rgba(236, 233, 224, 0.16);
+  --color-void: #050406;
+  --color-void-2: #0a0709;
+  --color-surface: #0c090b;
+  --color-surface-2: #130e10;
+  --color-line: rgba(214, 205, 197, 0.08);
+  --color-line-strong: rgba(214, 205, 197, 0.15);
 
-  --color-bone: #ece9e0;
-  --color-muted: #8b8997;
-  --color-faint: #56545f;
+  --color-bone: #d7d0c6;
+  --color-muted: #7c746f;
+  --color-faint: #494340;
 
-  --color-accent: #ff8a3d;
-  --color-accent-soft: #ffb273;
-  --color-accent-deep: #e0561f;
-  --color-cool: #5c6cff;
+  --color-accent: #c1121f;
+  --color-accent-soft: #e0413a;
+  --color-accent-deep: #6d0a10;
+  --color-cool: #5b6d74;
 
   --font-display: var(--font-instrument), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-hanken), system-ui, -apple-system, sans-serif;
@@ -35,9 +36,9 @@
 }
 
 :root {
-  --void: #07070b;
-  --accent: #ff8a3d;
-  --bone: #ece9e0;
+  --void: #050406;
+  --accent: #c1121f;
+  --bone: #d7d0c6;
   color-scheme: dark;
 }
 
@@ -59,15 +60,30 @@ body {
   overflow-x: hidden;
 }
 
-/* Subtle film grain so flat dark areas never look dead */
+/* Restless film grain — flat dark areas breathe like old film stock */
 body::before {
   content: "";
   position: fixed;
-  inset: 0;
-  z-index: 1;
+  inset: -50%;
+  z-index: 60;
   pointer-events: none;
-  opacity: 0.04;
+  opacity: 0.08;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.5s steps(3) infinite;
+}
+
+/* Blood vignette + faint scanlines — the room is never fully lit */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 120% at 50% 40%, transparent 52%, rgba(60, 3, 6, 0.35) 84%, rgba(2, 0, 1, 0.82) 100%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 3px);
+  mix-blend-mode: multiply;
+  animation: flicker 6.5s ease-in-out infinite;
 }
 
 ::selection {
@@ -195,6 +211,53 @@ body::before {
   0%, 100% { transform: translate(0, 0) scale(1); }
   33% { transform: translate(4%, -3%) scale(1.08); }
   66% { transform: translate(-3%, 2%) scale(0.96); }
+}
+/* ---- Horror keyframes ---- */
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(-4%, 3%); }
+  66% { transform: translate(3%, -2%); }
+  100% { transform: translate(-2%, -3%); }
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  8% { opacity: 0.82; }
+  9% { opacity: 1; }
+  40% { opacity: 0.95; }
+  41% { opacity: 0.7; }
+  42% { opacity: 1; }
+  72% { opacity: 0.88; }
+  73% { opacity: 1; }
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.16); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  56% { transform: scale(1); }
+}
+@keyframes textGlitch {
+  0%, 92%, 100% { transform: translate(0, 0); text-shadow: none; }
+  93% { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--color-accent), -2px 0 var(--color-cool); }
+  95% { transform: translate(2px, -1px); text-shadow: -2px 0 var(--color-accent), 2px 0 var(--color-cool); }
+  97% { transform: translate(-1px, 0); text-shadow: 1px 0 var(--color-accent); }
+}
+
+@keyframes bloodfall {
+  0%, 62% { transform: translateY(0) scaleY(1); opacity: 0; }
+  66% { opacity: 1; }
+  72% { transform: translateY(6px) scaleY(1.6); opacity: 1; }
+  100% { transform: translateY(120px) scaleY(2.6); opacity: 0; }
+}
+
+.horror-glitch {
+  animation: textGlitch 5.5s steps(1) infinite;
+}
+.pulse-blood {
+  animation: heartbeat 2.6s ease-in-out infinite;
+}
+.dread-glow {
+  text-shadow: 0 0 30px rgba(193, 18, 31, 0.55), 0 0 8px rgba(193, 18, 31, 0.4);
 }
 
 /* Respect reduced motion */
