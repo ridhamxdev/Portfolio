@@ -53,7 +53,7 @@ export default function Capabilities() {
         <p className="eyebrow mb-5">[ What I do ]</p>
       </Reveal>
       <RevealHeading className="display-lg max-w-3xl text-balance" delay={0.05}>
-        Three layers of the stack, <span className="font-display italic accent-text">engineered</span> end to end.
+        Three layers of the stack, <span className="font-display italic accent-text dread-glow">engineered</span> end to end.
       </RevealHeading>
 
       <div

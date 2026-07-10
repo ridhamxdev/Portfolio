@@ -71,7 +71,7 @@ export default function ScrollShowcase() {
         <div className="flex h-[68vh] w-[82vw] max-w-[460px] shrink-0 flex-col justify-center">
           <p className="eyebrow mb-5">[ Up close ]</p>
           <h2 className="font-display text-balance text-[clamp(2.6rem,6vw,5rem)] leading-[0.98] tracking-[-0.015em]">
-            A closer look at the <span className="italic accent-text">work</span>.
+            A closer look at the <span className="italic accent-text dread-glow">work</span>.
           </h2>
           <p className="mt-6 max-w-sm text-muted">
             Scroll to move sideways through the products — each one shipped, live,

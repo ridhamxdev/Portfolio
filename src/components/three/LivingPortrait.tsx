@@ -50,12 +50,13 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
 
   // Pull out the morph-target mesh and the aimable eye/head nodes once.
   const rig = useMemo(() => {
-    let mesh: Mesh | null = null;
+    let found: Mesh | undefined;
     scene.traverse((o) => {
       const m = o as Mesh;
-      if (m.morphTargetInfluences && m.morphTargetDictionary && !mesh) mesh = m;
+      if (m.morphTargetInfluences && m.morphTargetDictionary && !found) found = m;
     });
-    const dict = (mesh?.morphTargetDictionary ?? {}) as Record<string, number>;
+    const mesh: Mesh | null = found ?? null;
+    const dict = (found?.morphTargetDictionary ?? {}) as Record<string, number>;
     const eyeL =
       scene.getObjectByName("grp_eyeLeft") ||
       scene.getObjectByName("eyeLeft") ||
@@ -69,7 +70,7 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       scene.getObjectByName("Head") ||
       scene.getObjectByName("grp_transform");
     return {
-      mesh: mesh as Mesh | null,
+      mesh,
       dict,
       eyeL: eyeL as Object3D | undefined,
       eyeR: eyeR as Object3D | undefined,

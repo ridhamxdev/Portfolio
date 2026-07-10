@@ -243,6 +243,14 @@ body::after {
   97% { transform: translate(-1px, 0); text-shadow: 1px 0 var(--color-accent); }
 }
 
+@keyframes dreadPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.35); }
+}
+@keyframes eq {
+  0%, 100% { height: 30%; }
+  50% { height: 100%; }
+}
 @keyframes bloodfall {
   0%, 62% { transform: translateY(0) scaleY(1); opacity: 0; }
   66% { opacity: 1; }

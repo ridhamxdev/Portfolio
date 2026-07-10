@@ -58,7 +58,7 @@ export default function Stack() {
         <p className="eyebrow mb-5">[ Toolkit ]</p>
       </Reveal>
       <RevealHeading className="display-lg max-w-3xl text-balance" delay={0.05}>
-        The tools I reach for, by <span className="font-display italic accent-text">layer</span>.
+        The tools I reach for, by <span className="font-display italic accent-text dread-glow">layer</span>.
       </RevealHeading>
 
       <div ref={root} className="mt-14">
