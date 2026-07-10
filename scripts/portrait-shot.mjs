@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 900, height: 900 }, deviceScaleFactor: 1.5 });
+const page = await ctx.newPage();
+page.on("console", m => console.log("PAGE:", m.text()));
+page.on("pageerror", e => console.log("PAGEERR:", e.message));
+await page.goto("http://localhost:3000/portrait-test", { waitUntil: "networkidle", timeout: 45000 });
+await page.waitForTimeout(5000);
+await page.screenshot({ path: ".verify/portrait-test.png" });
+console.log("shot done");
+await browser.close();

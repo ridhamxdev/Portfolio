@@ -9,7 +9,7 @@ import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Magnetic from "@/components/Magnetic";
 import { heroScroll } from "@/lib/heroScroll";
 
-const Constellation = dynamic(() => import("@/components/three/Constellation"), {
+const LivingPortrait = dynamic(() => import("@/components/three/LivingPortrait"), {
   ssr: false,
   loading: () => (
     <div className="flex h-full w-full items-center justify-center">
@@ -73,7 +73,7 @@ export default function Hero() {
 
       {/* 3D stage — full bleed on mobile, right side on desktop */}
       <motion.div style={{ scale: stageScale, y: stageY }} className="absolute inset-0 lg:left-[40%]">
-        <Constellation />
+        <LivingPortrait />
       </motion.div>
 
       {/* legibility scrim */}
