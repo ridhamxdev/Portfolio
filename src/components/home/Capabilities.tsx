@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Reveal from "@/components/Reveal";
 import RevealHeading from "@/components/RevealHeading";
+import Scramble from "@/components/horror/Scramble";
 import { Server, Radio, BrainCircuit } from "lucide-react";
 
 const pillars = [
@@ -50,7 +51,7 @@ export default function Capabilities() {
   return (
     <section className="mx-auto max-w-[1400px] px-5 py-28 sm:px-8">
       <Reveal>
-        <p className="eyebrow mb-5">[ What I do ]</p>
+        <Scramble as="p" text="[ What I do ]" className="eyebrow mb-5 block" />
       </Reveal>
       <RevealHeading className="display-lg max-w-3xl text-balance" delay={0.05}>
         Three layers of the stack, <span className="font-display italic accent-text dread-glow">engineered</span> end to end.

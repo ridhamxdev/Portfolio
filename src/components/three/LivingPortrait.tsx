@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   useGLTF,
@@ -18,7 +18,15 @@ import {
   Noise,
 } from "@react-three/postprocessing";
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
-import { Group, Mesh, MathUtils, Object3D, WebGLRenderer } from "three";
+import {
+  Group,
+  Mesh,
+  MathUtils,
+  Object3D,
+  WebGLRenderer,
+  MeshStandardMaterial,
+  Color,
+} from "three";
 import { heroScroll } from "@/lib/heroScroll";
 
 const MODEL = "/models/facecap.glb";
@@ -94,6 +102,30 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
         r: morphIndex(dict, "eyeWide_R", "eyeWideRight"),
       },
     };
+  }, [scene]);
+
+  // Gore treatment: drain the skin to a corpse tint with a faint fevered flush,
+  // and hollow the eyes to dark, wet sockets. Runs once when the scene loads.
+  useEffect(() => {
+    scene.traverse((o) => {
+      const m = o as Mesh;
+      const mat = m.material as MeshStandardMaterial | undefined;
+      if (!mat || !("color" in mat)) return;
+      const name = o.name.toLowerCase();
+      if (name.includes("eye")) {
+        mat.color.set("#1a0405"); // sunken, near-black eyes
+        mat.roughness = 0.15; // wet glint
+        mat.metalness = 0.1;
+        if ("emissive" in mat) mat.emissive.set("#3a0206");
+      } else {
+        mat.color.multiplyScalar(0.82);
+        mat.color.lerp(new Color("#b7c2c4"), 0.35); // grey morgue pallor
+        if ("emissive" in mat) mat.emissive.set("#2a0507"); // fevered blood flush
+        mat.emissiveIntensity = 0.35;
+        mat.roughness = Math.min(1, (mat.roughness ?? 0.7) + 0.15);
+      }
+      mat.needsUpdate = true;
+    });
   }, [scene]);
 
   // Blink state machine — mostly slow, with the odd unsettling rapid double-blink.
