@@ -71,14 +71,18 @@ export default function Hero() {
         />
       </div>
 
-      {/* 3D stage — full bleed on mobile, right side on desktop */}
-      <motion.div style={{ scale: stageScale, y: stageY }} className="absolute inset-0 lg:left-[40%]">
+      {/* 3D stage — on mobile it fills the upper canvas so the face haunts the
+          headline; on desktop it sits on the right half clear of the text */}
+      <motion.div
+        style={{ scale: stageScale, y: stageY }}
+        className="absolute inset-x-0 top-0 bottom-[30%] lg:inset-0 lg:bottom-0 lg:left-[40%]"
+      >
         <LivingPortrait />
       </motion.div>
 
-      {/* legibility scrim */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-void via-void/70 to-transparent lg:via-void/30" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-void to-transparent" />
+      {/* legibility scrim — lighter on mobile so the face reads through */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-void via-void/45 to-transparent lg:via-void/30" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-void via-void/80 to-transparent lg:h-40 lg:via-transparent" />
 
       <motion.div style={{ y: contentY, opacity: contentOpacity }} className="relative z-10 mx-auto w-full max-w-[1400px]">
         <div className="hero-eyebrow mb-6 inline-flex items-center gap-2.5 rounded-full border border-line-strong bg-surface/40 py-1.5 pl-3 pr-4 backdrop-blur-sm">

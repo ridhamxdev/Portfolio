@@ -66,8 +66,8 @@ export default function Nav() {
           </Link>
 
           {/* right cluster */}
-          <div className="flex items-center gap-3 sm:gap-6">
-            <nav className="flex items-center gap-1 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-6">
+            <nav className="flex items-center gap-0.5 sm:gap-4">
               {links.map((l) => {
                 const active = pathname.startsWith(l.href);
                 return (
@@ -104,7 +104,7 @@ export default function Nav() {
             <Magnetic className="inline-block">
               <Link
                 href="/#contact"
-                className="inline-flex items-center gap-2 rounded-full border border-line-strong px-4 py-2 font-mono text-[0.7rem] uppercase tracking-[0.16em] text-bone transition-colors duration-300 hover:border-accent hover:bg-accent hover:text-[#160a02]"
+                className="inline-flex items-center gap-2 rounded-full border border-line-strong px-3 py-2 font-mono text-[0.7rem] uppercase tracking-[0.16em] text-bone transition-colors duration-300 hover:border-accent hover:bg-accent hover:text-[#160a02] sm:px-4"
               >
                 Contact
               </Link>
