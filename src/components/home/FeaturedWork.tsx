@@ -31,7 +31,7 @@ export default function FeaturedWork() {
             <p className="eyebrow mb-5">[ Selected work ]</p>
           </Reveal>
           <RevealHeading className="display-lg text-balance" delay={0.05}>
-            Things I&apos;ve <span className="font-display italic accent-text">shipped</span>.
+            Things I&apos;ve <span className="font-display italic accent-text dread-glow">shipped</span>.
           </RevealHeading>
         </div>
         <Reveal>

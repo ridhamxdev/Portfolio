@@ -7,6 +7,7 @@ import Stack from "@/components/home/Stack";
 import Reveal from "@/components/Reveal";
 import Parallax from "@/components/Parallax";
 import Counter from "@/components/Counter";
+import { SkullWatermark } from "@/components/horror/HorrorMotifs";
 
 const stats = [
   { value: "17", label: "Projects shipped", drift: 34 },
@@ -24,9 +25,10 @@ export default function Home() {
       <ScrollShowcase />
       <FeaturedWork />
 
-      <section className="mx-auto max-w-[1400px] px-5 sm:px-8">
+      <section className="relative mx-auto max-w-[1400px] px-5 sm:px-8">
+        <SkullWatermark size={620} />
         <Reveal>
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-4">
+          <div className="relative grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-4">
             {stats.map((s) => (
               <div key={s.label} className="bg-void px-6 py-10 text-center">
                 <Parallax speed={s.drift}>

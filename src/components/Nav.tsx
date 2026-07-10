@@ -97,7 +97,7 @@ export default function Nav() {
 
             {/* live local time — small editorial signal of availability */}
             <span className="hidden items-center gap-2 border-l border-line pl-5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-faint md:flex">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400/80" />
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent shadow-[0_0_8px_rgba(193,18,31,0.8)]" />
               Bengaluru {time}
             </span>
 

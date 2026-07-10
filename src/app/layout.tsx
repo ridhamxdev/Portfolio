@@ -7,6 +7,9 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Background from "@/components/Background";
 import ScrollProgress from "@/components/ScrollProgress";
+import HorrorAudio from "@/components/horror/HorrorAudio";
+import DreadOverlay from "@/components/horror/DreadOverlay";
+import JumpScare from "@/components/horror/JumpScare";
 
 const instrument = Instrument_Serif({
   weight: "400",
@@ -68,6 +71,7 @@ export default function RootLayout({
     >
       <body className="bg-void text-bone antialiased">
         <Background />
+        <DreadOverlay />
         <Cursor />
         <ScrollProgress />
         <Nav />
@@ -75,6 +79,8 @@ export default function RootLayout({
           {children}
           <Footer />
         </SmoothScroll>
+        <HorrorAudio />
+        <JumpScare />
       </body>
     </html>
   );

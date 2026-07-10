@@ -81,7 +81,7 @@ function useCardTexture(project: Project) {
       // pill (LIVE / SOURCE)
       ctx.font = "600 22px monospace";
       const label = overImage ? "● LIVE" : "◆ SOURCE";
-      ctx.fillStyle = overImage ? "#ff8a3d" : "#8b8997";
+      ctx.fillStyle = overImage ? "#c1121f" : "#8b8997";
       ctx.fillText(label, 46, 64);
       ctx.fillStyle = "#8b8997";
       ctx.textAlign = "right";
@@ -110,7 +110,7 @@ function useCardTexture(project: Project) {
         [60, 110],
         [-40, 50],
       ];
-      ctx.strokeStyle = "rgba(255,138,61,0.5)";
+      ctx.strokeStyle = "rgba(193,18,31,0.6)";
       ctx.lineWidth = 1.5;
       for (let i = 0; i < pts.length; i++)
         for (let j = i + 1; j < pts.length; j++) {
@@ -119,7 +119,7 @@ function useCardTexture(project: Project) {
           ctx.lineTo(pts[j][0], pts[j][1]);
           ctx.stroke();
         }
-      ctx.fillStyle = "#ffb273";
+      ctx.fillStyle = "#e0413a";
       for (const [px, py] of pts) {
         ctx.beginPath();
         ctx.arc(px, py, 5, 0, Math.PI * 2);
@@ -331,8 +331,8 @@ export default function ProjectsGallery3D({
           color="#000000"
         />
         <Environment resolution={256}>
-          <Lightformer form="rect" intensity={2} color="#ff8a3d" position={[-4, 2, 3]} scale={[6, 6, 1]} />
-          <Lightformer form="rect" intensity={1.4} color="#5c6cff" position={[4, -1, 3]} scale={[6, 6, 1]} />
+          <Lightformer form="rect" intensity={2} color="#c1121f" position={[-4, 2, 3]} scale={[6, 6, 1]} />
+          <Lightformer form="rect" intensity={1.4} color="#5b6d74" position={[4, -1, 3]} scale={[6, 6, 1]} />
           <Lightformer form="circle" intensity={1.2} color="#ffffff" position={[0, 4, -3]} scale={4} />
         </Environment>
       </Canvas>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
 import Counter from "@/components/Counter";
+import { SkullWatermark } from "@/components/horror/HorrorMotifs";
 
 export const metadata: Metadata = {
   title: "About — Ridham Goyal",
@@ -35,7 +36,7 @@ export default function AboutPage() {
         <p className="eyebrow mb-6">[ About ]</p>
         <h1 className="display-lg max-w-4xl text-balance">
           I&apos;m Ridham — I gravitate to the{" "}
-          <span className="font-display italic accent-text">hard parts</span> of
+          <span className="font-display italic accent-text dread-glow">hard parts</span> of
           software.
         </h1>
       </Reveal>
@@ -107,11 +108,12 @@ export default function AboutPage() {
       </div>
 
       {/* principles */}
-      <section className="mt-32">
+      <section className="relative mt-32">
+        <SkullWatermark size={560} className="!top-[60%]" />
         <Reveal>
           <p className="eyebrow mb-5">[ How I work ]</p>
           <h2 className="display-lg max-w-3xl text-balance">
-            Four things I keep coming <span className="font-display italic accent-text">back to</span>.
+            Four things I keep coming <span className="font-display italic accent-text dread-glow">back to</span>.
           </h2>
         </Reveal>
 
