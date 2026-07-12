@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import {
   useGLTF,
   Environment,
@@ -16,31 +16,31 @@ import {
   Vignette,
   Noise,
 } from "@react-three/postprocessing";
-import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import {
   Group,
   Mesh,
   MathUtils,
   Object3D,
-  WebGLRenderer,
+  Euler,
   MeshStandardMaterial,
   Color,
 } from "three";
 import { heroScroll } from "@/lib/heroScroll";
 
-const MODEL = "/models/facecap.glb";
+// A Ready Player Me avatar — full body, full ARKit blendshapes, plain embedded
+// textures (no Draco/KTX2). We drop the body and float just the head as a
+// haunting bust; the same rig that drove the old face scan drives it unchanged.
+const MODEL = "/models/harry.glb";
 
-// The face scan ships KTX2-compressed textures; teach the GLTF loader to
-// transcode them with the Basis worker served from /public/basis.
-function useFaceGLTF(gl: WebGLRenderer) {
-  return useGLTF(MODEL, true, true, (loader) => {
-    const ktx2 = new KTX2Loader()
-      .setTranscoderPath("/basis/")
-      .detectSupport(gl);
-    // @ts-expect-error drei's GLTFLoader accepts a KTX2Loader
-    loader.setKTX2Loader(ktx2);
-  });
-}
+// Meshes below the neck — removed so the framing sees only a floating head.
+const BODY_PARTS = [
+  "Wolf3D_Body",
+  "Wolf3D_Outfit_Top",
+  "Wolf3D_Outfit_Bottom",
+  "Wolf3D_Outfit_Footwear",
+];
+
+useGLTF.preload(MODEL);
 
 // ARKit blendshape names differ across exporters (facecap uses `eyeBlink_L`,
 // Ready Player Me uses `eyeBlinkLeft`). Resolve by trying every known spelling
@@ -51,19 +51,24 @@ function morphIndex(dict: Record<string, number>, ...names: string[]) {
 }
 
 function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
-  const gl = useThree((s) => s.gl);
-  const { scene } = useFaceGLTF(gl);
+  const { scene } = useGLTF(MODEL);
   const root = useRef<Group>(null);
 
-  // Pull out the morph-target mesh and the aimable eye/head nodes once.
+  // Pull out the morph meshes and the aimable eye/head bones once. Also drop the
+  // body here (during render) so it's gone before <Bounds> measures the scene.
   const rig = useMemo(() => {
-    let found: Mesh | undefined;
+    for (const n of BODY_PARTS) {
+      const o = scene.getObjectByName(n);
+      o?.parent?.remove(o);
+    }
+    // RPM spreads morphs across the face AND teeth meshes — keep both so the jaw
+    // and teeth open together. Indices line up (identical target order).
+    const meshes: Mesh[] = [];
     scene.traverse((o) => {
       const m = o as Mesh;
-      if (m.morphTargetInfluences && m.morphTargetDictionary && !found) found = m;
+      if (m.morphTargetInfluences && m.morphTargetDictionary) meshes.push(m);
     });
-    const mesh: Mesh | null = found ?? null;
-    const dict = (found?.morphTargetDictionary ?? {}) as Record<string, number>;
+    const dict = (meshes[0]?.morphTargetDictionary ?? {}) as Record<string, number>;
     const eyeL =
       scene.getObjectByName("grp_eyeLeft") ||
       scene.getObjectByName("eyeLeft") ||
@@ -77,7 +82,7 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       scene.getObjectByName("Head") ||
       scene.getObjectByName("grp_transform");
     return {
-      mesh,
+      meshes,
       dict,
       eyeL: eyeL as Object3D | undefined,
       eyeR: eyeR as Object3D | undefined,
@@ -120,8 +125,8 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
         mat.roughness = 0.2;
         mat.metalness = 0.05;
         if ("emissive" in mat) mat.emissiveIntensity = 0;
-      } else {
-        // preserve the albedo map; only a slight cool, desaturated, pallid cast
+      } else if (name.includes("head") || name.includes("body") || name.includes("skin")) {
+        // skin only: preserve the albedo, add a slight cool, pallid, sleepless cast
         mat.color.lerp(new Color("#dcd6cf"), 0.14);
         if ("emissive" in mat) mat.emissive.set("#1a0d0a"); // faint warm subsurface
         mat.emissiveIntensity = 0.12;
@@ -130,6 +135,7 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
         mat.envMapIntensity = 0.9;
         skinMats.current.push(mat);
       }
+      // hair, glasses, teeth: left exactly as authored so they read real
       mat.needsUpdate = true;
     });
   }, [scene]);
@@ -139,6 +145,9 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
   // Twitch: brief involuntary head jerk at rare intervals — the body glitches.
   const twitch = useRef({ next: 4, t: 0, x: 0, y: 0 });
   const time = useRef(0);
+  // The RPM head/eye bones have a rest tilt — capture it once so we aim RELATIVE
+  // to the bind pose instead of snapping the head to a broken orientation.
+  const bases = useRef<{ head?: Euler; eyeL?: Euler; eyeR?: Euler }>({});
 
   // Laugh: on a loop the spirit throws its head back and cackles — the jaw pulses
   // in time with a synthesised maniacal laugh, echoing into the dark.
@@ -255,19 +264,26 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
     time.current += delta;
     const t = time.current;
     const p = ptr.current; // whole-viewport cursor, -1..1
-    const infl = rig.mesh?.morphTargetInfluences;
+
+    // capture the bind-pose rotations once, the first frame each bone exists
+    if (!bases.current.head && rig.head) bases.current.head = rig.head.rotation.clone();
+    if (!bases.current.eyeL && rig.eyeL) bases.current.eyeL = rig.eyeL.rotation.clone();
+    if (!bases.current.eyeR && rig.eyeR) bases.current.eyeR = rig.eyeR.rotation.clone();
+    const bH = bases.current.head;
 
     // --- gaze: a deliberate lock-on that settles fast enough to feel aware, but
     // still with a touch of lag so it reads as watching, not snapping.
     const gazeX = MathUtils.clamp(p.x, -1, 1);
     const gazeY = MathUtils.clamp(p.y, -1, 1);
-    if (rig.eyeL && rig.eyeR) {
-      const ey = -gazeX * 0.62; // eyes over-rotate slightly — too aware
-      const ex = -gazeY * 0.42;
-      for (const e of [rig.eyeL, rig.eyeR]) {
-        e.rotation.y = MathUtils.lerp(e.rotation.y, ey, 0.12);
-        e.rotation.x = MathUtils.lerp(e.rotation.x, ex, 0.12);
-      }
+    const bEL = bases.current.eyeL;
+    const bER = bases.current.eyeR;
+    if (rig.eyeL && rig.eyeR && bEL && bER) {
+      const ey = -gazeX * 0.5; // eyeballs turn to follow, over-aware
+      const ex = -gazeY * 0.32;
+      rig.eyeL.rotation.y = MathUtils.lerp(rig.eyeL.rotation.y, bEL.y + ey, 0.14);
+      rig.eyeL.rotation.x = MathUtils.lerp(rig.eyeL.rotation.x, bEL.x + ex, 0.14);
+      rig.eyeR.rotation.y = MathUtils.lerp(rig.eyeR.rotation.y, bER.y + ey, 0.14);
+      rig.eyeR.rotation.x = MathUtils.lerp(rig.eyeR.rotation.x, bER.x + ex, 0.14);
     }
 
     // --- twitch scheduler
@@ -304,24 +320,30 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       if (lg.next <= 0) triggerLaugh();
     }
 
-    if (root.current) {
-      // shallow, laboured breathing + slow tracking head turn + micro twitch,
-      // plus a head thrown BACK and bobbing while it laughs
-      const breathe = Math.sin(t * 0.85) * 0.02;
-      const headBack = MathUtils.lerp(0, 0.16, laughOn) + laughJaw * 0.05;
-      root.current.rotation.y = MathUtils.lerp(
-        root.current.rotation.y,
-        gazeX * 0.38 + Math.sin(t * 0.31) * 0.03 + tw.x,
-        0.07
+    // --- head turn: pivot the actual neck/head bone so the body would stay put,
+    // tracking the cursor, breathing, twitching, and thrown BACK while it laughs
+    const breathe = Math.sin(t * 0.85) * 0.02;
+    const headBack = laughOn * 0.16 + laughJaw * 0.06;
+    if (rig.head && bH) {
+      rig.head.rotation.y = MathUtils.lerp(
+        rig.head.rotation.y,
+        bH.y + gazeX * 0.34 + Math.sin(t * 0.31) * 0.03 + tw.x,
+        laughOn ? 0.18 : 0.07
       );
-      root.current.rotation.x = MathUtils.lerp(
-        root.current.rotation.x,
-        -gazeY * 0.22 + breathe + tw.y + headBack,
+      rig.head.rotation.x = MathUtils.lerp(
+        rig.head.rotation.x,
+        bH.x - gazeY * 0.2 + breathe + tw.y - headBack,
         laughOn ? 0.2 : 0.075
       );
-      root.current.position.y = Math.sin(t * 0.85) * 0.01;
-      root.current.rotation.z =
-        Math.sin(t * 0.19) * 0.03 + tw.x * 0.5 + laughJaw * 0.04; // faint tilt + shudder
+      rig.head.rotation.z = MathUtils.lerp(
+        rig.head.rotation.z,
+        bH.z + Math.sin(t * 0.19) * 0.03 + tw.x * 0.5 + laughJaw * 0.04,
+        0.1
+      );
+    }
+    if (root.current) {
+      // a slow, ghostly vertical drift for the floating head
+      root.current.position.y = -0.15 + Math.sin(t * 0.8) * 0.012;
     }
 
     // --- a faint living warmth under the skin, lifting a touch as it laughs.
@@ -355,9 +377,19 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
         }
       }
     }
-    if (infl) {
-      if (rig.blink.l >= 0) infl[rig.blink.l] = b.v;
-      if (rig.blink.r >= 0) infl[rig.blink.r] = b.v;
+    // Drive a morph on every mesh that owns it (face + teeth share indices).
+    const face = rig.meshes[0]?.morphTargetInfluences;
+    const cur = (i: number) => (i >= 0 && face ? face[i] ?? 0 : 0);
+    const set = (i: number, v: number) => {
+      if (i < 0) return;
+      for (const mm of rig.meshes) {
+        const mi = mm.morphTargetInfluences;
+        if (mi && i < mi.length) mi[i] = v;
+      }
+    };
+    if (face) {
+      set(rig.blink.l, b.v);
+      set(rig.blink.r, b.v);
 
       // --- expression: resting dread (jaw cracked open, brows drawn down),
       // deepening into a wide-eyed menace as the hero scrolls away.
@@ -369,21 +401,20 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       // a laugh is a rictus grin, not a friendly one — force the smile up mid-cackle
       const grin = laughOn * (0.55 + laughJaw * 0.35);
       const jawEase = laughOn ? 0.55 : 0.05; // snap the jaw during the laugh
-      if (rig.jaw >= 0) infl[rig.jaw] = MathUtils.lerp(infl[rig.jaw] ?? 0, jaw, jawEase);
-      // browInnerUp lifted only a touch; rely on wide eyes for menace
-      if (rig.browUp >= 0) infl[rig.browUp] = MathUtils.lerp(infl[rig.browUp] ?? 0, browDown * 0.3, 0.05);
-      if (rig.wide.l >= 0) infl[rig.wide.l] = MathUtils.lerp(infl[rig.wide.l] ?? 0, wide, 0.05);
-      if (rig.wide.r >= 0) infl[rig.wide.r] = MathUtils.lerp(infl[rig.wide.r] ?? 0, wide, 0.05);
+      set(rig.jaw, MathUtils.lerp(cur(rig.jaw), jaw, jawEase));
+      set(rig.browUp, MathUtils.lerp(cur(rig.browUp), browDown * 0.3, 0.05));
+      set(rig.wide.l, MathUtils.lerp(cur(rig.wide.l), wide, 0.05));
+      set(rig.wide.r, MathUtils.lerp(cur(rig.wide.r), wide, 0.05));
       // eyes crush to squinting slits while it cackles
-      if (rig.squint.l >= 0) infl[rig.squint.l] = MathUtils.lerp(infl[rig.squint.l] ?? 0, laughOn * 0.6, 0.2);
-      if (rig.squint.r >= 0) infl[rig.squint.r] = MathUtils.lerp(infl[rig.squint.r] ?? 0, laughOn * 0.6, 0.2);
+      set(rig.squint.l, MathUtils.lerp(cur(rig.squint.l), laughOn * 0.6, 0.2));
+      set(rig.squint.r, MathUtils.lerp(cur(rig.squint.r), laughOn * 0.6, 0.2));
       // grin only appears mid-laugh — a rictus — otherwise stays flat and cold
-      if (rig.smile.l >= 0) infl[rig.smile.l] = MathUtils.lerp(infl[rig.smile.l] ?? 0, grin, 0.25);
-      if (rig.smile.r >= 0) infl[rig.smile.r] = MathUtils.lerp(infl[rig.smile.r] ?? 0, grin, 0.25);
+      set(rig.smile.l, MathUtils.lerp(cur(rig.smile.l), grin, 0.25));
+      set(rig.smile.r, MathUtils.lerp(cur(rig.smile.r), grin, 0.25));
     }
   });
 
-  // facecap is authored ~2 units tall and centred near y=0; frame it as a bust.
+  // Body removed in the rig memo; <Bounds> auto-frames the remaining head.
   return (
     <group ref={root} position={[0, -0.15, 0]} rotation={[0, 0, 0]}>
       <primitive object={scene} />
