@@ -14,7 +14,6 @@ import {
   EffectComposer,
   Bloom,
   Vignette,
-  ChromaticAberration,
   Noise,
 } from "@react-three/postprocessing";
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
@@ -104,9 +103,10 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
     };
   }, [scene]);
 
-  // Spectral treatment: bleach the skin to a translucent, cold-glowing apparition
-  // and set the hollow eyes faintly alight — a ghost, not a corpse. Skin materials
-  // are kept so their opacity can flicker like a fading spirit each frame.
+  // Realism-first treatment: KEEP the scan's real skin texture and only nudge it
+  // a touch cool and pallid so it fits the dark site without wiping the human tone.
+  // Solid and opaque — no ghost transparency. Kept for a faint living emissive
+  // breath that lifts as the face laughs.
   const skinMats = useRef<MeshStandardMaterial[]>([]);
   useEffect(() => {
     skinMats.current = [];
@@ -116,23 +116,18 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       if (!mat || !("color" in mat)) return;
       const name = o.name.toLowerCase();
       if (name.includes("eye")) {
-        mat.color.set("#05080c"); // black hollows...
-        mat.roughness = 0.1;
-        mat.metalness = 0.1;
-        if ("emissive" in mat) {
-          mat.emissive.set("#7fc4e6"); // ...with a cold spectral light behind them
-          mat.emissiveIntensity = 0.7;
-        }
+        // natural, wet-looking eyes — leave the scanned colour, just glaze them
+        mat.roughness = 0.2;
+        mat.metalness = 0.05;
+        if ("emissive" in mat) mat.emissiveIntensity = 0;
       } else {
-        mat.color.multiplyScalar(0.9);
-        mat.color.lerp(new Color("#cfdbe4"), 0.6); // pale, drained, moonlit
-        if ("emissive" in mat) mat.emissive.set("#3f6f88"); // cold inner glow
-        mat.emissiveIntensity = 0.6;
-        mat.roughness = 0.55;
+        // preserve the albedo map; only a slight cool, desaturated, pallid cast
+        mat.color.lerp(new Color("#dcd6cf"), 0.14);
+        if ("emissive" in mat) mat.emissive.set("#1a0d0a"); // faint warm subsurface
+        mat.emissiveIntensity = 0.12;
+        mat.roughness = Math.min(1, (mat.roughness ?? 0.62) + 0.04); // skin isn't glossy
         mat.metalness = 0;
-        mat.transparent = true;
-        mat.opacity = 0.72; // see-through, like a projection
-        mat.depthWrite = false;
+        mat.envMapIntensity = 0.9;
         skinMats.current.push(mat);
       }
       mat.needsUpdate = true;
@@ -329,18 +324,11 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
         Math.sin(t * 0.19) * 0.03 + tw.x * 0.5 + laughJaw * 0.04; // faint tilt + shudder
     }
 
-    // --- spectral flicker: the apparition wavers, dimming and surging like a
-    // failing projection, and burns brighter as it laughs
+    // --- a faint living warmth under the skin, lifting a touch as it laughs.
+    // The face stays fully solid and real — no ghost transparency.
     if (skinMats.current.length) {
-      const flick =
-        0.66 +
-        Math.sin(t * 3.1) * 0.05 +
-        (Math.sin(t * 17.0) > 0.86 ? -0.14 : 0) +
-        laughOn * 0.08;
-      for (const mat of skinMats.current) {
-        mat.opacity = MathUtils.clamp(flick, 0.4, 0.86);
-        mat.emissiveIntensity = 0.55 + laughOn * 0.5 + laughJaw * 0.4;
-      }
+      const glow = 0.12 + Math.sin(t * 1.1) * 0.02 + laughOn * 0.14 + laughJaw * 0.1;
+      for (const mat of skinMats.current) mat.emissiveIntensity = glow;
     }
 
     // --- blinking (with occasional snap double-blink)
@@ -411,21 +399,24 @@ export default function LivingPortrait({ debug = false }: { debug?: boolean }) {
       camera={{ position: [0, 0.05, 1.35], fov: 34 }}
       style={{ background: debug ? "#20222a" : "transparent" }}
     >
-      {/* corpse light: dim cold ambient, a low blood key from below (horror
-          underlight), and a hard cold rim so the skull edge reads in the dark */}
-      <ambientLight intensity={0.16} color="#8390a0" />
-      <pointLight position={[0, -1.7, 1.6]} intensity={7} color="#d21b23" distance={9} decay={1.8} />
-      <spotLight position={[-2.4, 0.3, 2]} angle={0.55} penumbra={1} intensity={7} color="#5c6d78" distance={12} />
-      <pointLight position={[2.8, 1.6, 0.4]} intensity={5} color="#9fb0c4" distance={12} decay={1.7} />
+      {/* realistic 3-point lighting so the scanned skin reads as human flesh:
+          a soft warm key, a cool fill, a cold rim — plus a low blood underlight
+          kept dim, just for the site's mood */}
+      <ambientLight intensity={0.5} color="#ccd5df" />
+      <spotLight position={[2.2, 2.4, 2.6]} angle={0.6} penumbra={0.9} intensity={18} color="#fff1e0" distance={16} decay={2} />
+      <pointLight position={[-2.8, 0.4, 1.8]} intensity={4} color="#7d94b0" distance={12} decay={2} />
+      <pointLight position={[0, 1.2, -2.4]} intensity={5} color="#aeb9c6" distance={12} decay={2} />
+      <pointLight position={[0, -1.9, 1.3]} intensity={2} color="#8f1116" distance={7} decay={2.2} />
 
       <Suspense fallback={null}>
         <Bounds fit clip observe margin={1.15}>
           <Face />
         </Bounds>
         <Environment resolution={256}>
-          <Lightformer form="rect" intensity={1.1} color="#3a4650" position={[-2.5, 1.5, 2]} scale={[5, 5, 1]} />
-          <Lightformer form="rect" intensity={1.6} color="#8f1015" position={[0.5, -2, 1.5]} scale={[4, 4, 1]} />
-          <Lightformer form="ring" intensity={0.4} color="#20262e" position={[0, 0, -3]} scale={4} />
+          <Lightformer form="rect" intensity={2.2} color="#fff4e8" position={[2, 2, 2]} scale={[6, 6, 1]} />
+          <Lightformer form="rect" intensity={1.2} color="#8ea3bd" position={[-3, 0.5, 1.5]} scale={[5, 5, 1]} />
+          <Lightformer form="rect" intensity={0.8} color="#6d0a10" position={[0, -2.2, 1]} scale={[4, 3, 1]} />
+          <Lightformer form="ring" intensity={0.3} color="#141a20" position={[0, 0, -3]} scale={4} />
         </Environment>
       </Suspense>
 
@@ -434,10 +425,9 @@ export default function LivingPortrait({ debug = false }: { debug?: boolean }) {
       {debug && <OrbitControls makeDefault />}
 
       <EffectComposer enableNormalPass={false}>
-        <Bloom mipmapBlur intensity={0.9} luminanceThreshold={0.55} luminanceSmoothing={0.35} />
-        <ChromaticAberration offset={[0.0018, 0.0012]} radialModulation={false} modulationOffset={0} />
-        <Noise premultiply opacity={0.16} />
-        <Vignette eskil={false} offset={0.16} darkness={0.92} />
+        <Bloom mipmapBlur intensity={0.4} luminanceThreshold={0.72} luminanceSmoothing={0.3} />
+        <Noise premultiply opacity={0.05} />
+        <Vignette eskil={false} offset={0.22} darkness={0.72} />
       </EffectComposer>
     </Canvas>
   );
