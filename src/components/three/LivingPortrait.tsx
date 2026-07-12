@@ -134,21 +134,36 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
   const twitch = useRef({ next: 4, t: 0, x: 0, y: 0 });
   const time = useRef(0);
 
-  useFrame((state, delta) => {
+  // Track the cursor across the WHOLE page, not just this canvas. `state.pointer`
+  // only updates while the mouse is over the small hero canvas, so the stare would
+  // freeze the moment you moved onto text. A window-level listener keeps the eyes
+  // locked on you anywhere on the page.
+  const ptr = useRef({ x: 0, y: 0 });
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      ptr.current.x = (e.clientX / window.innerWidth) * 2 - 1; // -1..1
+      ptr.current.y = -((e.clientY / window.innerHeight) * 2 - 1); // -1..1, up is +
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
+
+  useFrame((_, delta) => {
     time.current += delta;
     const t = time.current;
-    const p = state.pointer; // -1..1
+    const p = ptr.current; // whole-viewport cursor, -1..1
     const infl = rig.mesh?.morphTargetInfluences;
 
-    // --- gaze: a slow, deliberate lock-on that lags then settles — a dead stare
+    // --- gaze: a deliberate lock-on that settles fast enough to feel aware, but
+    // still with a touch of lag so it reads as watching, not snapping.
     const gazeX = MathUtils.clamp(p.x, -1, 1);
     const gazeY = MathUtils.clamp(p.y, -1, 1);
     if (rig.eyeL && rig.eyeR) {
-      const ey = -gazeX * 0.5; // eyes over-rotate slightly — too aware
-      const ex = -gazeY * 0.36;
+      const ey = -gazeX * 0.62; // eyes over-rotate slightly — too aware
+      const ex = -gazeY * 0.42;
       for (const e of [rig.eyeL, rig.eyeR]) {
-        e.rotation.y = MathUtils.lerp(e.rotation.y, ey, 0.055);
-        e.rotation.x = MathUtils.lerp(e.rotation.x, ex, 0.055);
+        e.rotation.y = MathUtils.lerp(e.rotation.y, ey, 0.12);
+        e.rotation.x = MathUtils.lerp(e.rotation.x, ex, 0.12);
       }
     }
 
@@ -168,13 +183,13 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       const breathe = Math.sin(t * 0.85) * 0.02;
       root.current.rotation.y = MathUtils.lerp(
         root.current.rotation.y,
-        gazeX * 0.26 + Math.sin(t * 0.31) * 0.03 + tw.x,
-        0.035
+        gazeX * 0.38 + Math.sin(t * 0.31) * 0.03 + tw.x,
+        0.07
       );
       root.current.rotation.x = MathUtils.lerp(
         root.current.rotation.x,
-        -gazeY * 0.16 + breathe + tw.y,
-        0.04
+        -gazeY * 0.22 + breathe + tw.y,
+        0.075
       );
       root.current.position.y = Math.sin(t * 0.85) * 0.01;
       root.current.rotation.z = Math.sin(t * 0.19) * 0.03 + tw.x * 0.5; // faint head tilt

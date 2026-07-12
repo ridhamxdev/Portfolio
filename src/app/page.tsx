@@ -8,6 +8,7 @@ import Reveal from "@/components/Reveal";
 import Parallax from "@/components/Parallax";
 import Counter from "@/components/Counter";
 import { SkullWatermark } from "@/components/horror/HorrorMotifs";
+import { RibcageWatermark } from "@/components/horror/Skeletons";
 
 const stats = [
   { value: "17", label: "Projects shipped", drift: 34 },
@@ -27,6 +28,7 @@ export default function Home() {
 
       <section className="relative mx-auto max-w-[1400px] px-5 sm:px-8">
         <SkullWatermark size={620} />
+        <RibcageWatermark size={560} className="translate-y-24" />
         <Reveal>
           <div className="relative grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-4">
             {stats.map((s) => (

@@ -280,6 +280,49 @@ body::after {
   100% { transform: translateY(120px) scaleY(2.6); opacity: 0; }
 }
 
+/* Jumpscare: colours tear inside-out for a frame, then the shake gets violent */
+@keyframes scareInvert {
+  0% { filter: invert(0) contrast(1); }
+  20% { filter: invert(1) contrast(2.2) hue-rotate(-20deg); }
+  45% { filter: invert(0) contrast(1.6); }
+  60% { filter: invert(1) contrast(2); }
+  100% { filter: invert(0) contrast(1); }
+}
+@keyframes scareShakeHard {
+  0%, 100% { transform: translate(0, 0) scale(1.02); }
+  10% { transform: translate(-32px, 18px) rotate(-2deg) scale(1.05); }
+  25% { transform: translate(28px, -22px) rotate(2.2deg) scale(1.06); }
+  40% { transform: translate(-24px, -16px) rotate(-1.6deg) scale(1.04); }
+  55% { transform: translate(22px, 20px) rotate(1.4deg) scale(1.05); }
+  70% { transform: translate(-16px, 12px) rotate(-1deg) scale(1.03); }
+  85% { transform: translate(12px, -10px) rotate(0.8deg) scale(1.03); }
+}
+.scare-shake-hard {
+  animation: scareShakeHard 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+@keyframes scareSkullIn {
+  0% { transform: scale(0.2) rotate(-4deg); opacity: 0; }
+  22% { opacity: 1; }
+  55% { transform: scale(1.08) rotate(1.5deg); }
+  70% { transform: scale(0.98) rotate(-1deg); }
+  100% { transform: scale(1.14) rotate(0.5deg); opacity: 1; }
+}
+
+/* Skeleton hand: bony fingers claw up from the bottom edge, then withdraw */
+@keyframes clawReach {
+  0%, 100% { transform: translateY(102%) rotate(0deg); }
+  8% { transform: translateY(58%) rotate(-1deg); }
+  14% { transform: translateY(46%) rotate(1deg); }
+  20% { transform: translateY(52%) rotate(-0.5deg); }
+  30% { transform: translateY(50%) rotate(0deg); }
+  70% { transform: translateY(56%) rotate(0.5deg); }
+  84% { transform: translateY(78%) rotate(-1deg); }
+}
+@keyframes boneSway {
+  0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+  50% { transform: translateY(-8px) rotate(0.6deg); }
+}
+
 .horror-glitch {
   animation: textGlitch 5.5s steps(1) infinite;
 }
