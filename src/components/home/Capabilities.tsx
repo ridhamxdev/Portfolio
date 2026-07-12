@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Reveal from "@/components/Reveal";
 import RevealHeading from "@/components/RevealHeading";
 import Scramble from "@/components/horror/Scramble";
+import { SkullWatermark } from "@/components/horror/HorrorMotifs";
 import { Server, Radio, BrainCircuit } from "lucide-react";
 
 const pillars = [
@@ -49,7 +50,8 @@ export default function Capabilities() {
   }, []);
 
   return (
-    <section className="mx-auto max-w-[1400px] px-5 py-28 sm:px-8">
+    <section className="relative mx-auto max-w-[1400px] overflow-hidden px-5 py-28 sm:px-8">
+      <SkullWatermark size={560} className="opacity-70" />
       <Reveal>
         <Scramble as="p" text="[ What I do ]" className="eyebrow mb-5 block" />
       </Reveal>
@@ -64,7 +66,7 @@ export default function Capabilities() {
         {pillars.map((p, i) => (
           <div
             key={p.title}
-            className="cap-card group flex h-full flex-col gap-5 bg-surface/30 p-8 transition-colors duration-500 hover:bg-surface/70 lg:p-10"
+            className="cap-card card-bleed group relative flex h-full flex-col gap-5 bg-surface/30 p-8 transition-colors duration-500 hover:bg-surface/70 lg:p-10"
           >
             <div className="flex items-center justify-between">
               <p.Icon className="h-6 w-6 text-accent" strokeWidth={1.5} />

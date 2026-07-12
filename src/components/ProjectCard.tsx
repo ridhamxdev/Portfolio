@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowUpRight, Github } from "lucide-react";
+import { ArrowUpRight, Github, Skull } from "lucide-react";
 import type { Project } from "@/data/projects";
 
 export default function ProjectCard({ project }: { project: Project }) {
@@ -27,7 +27,7 @@ export default function ProjectCard({ project }: { project: Project }) {
       onMouseMove={onMove}
       onMouseLeave={reset}
       style={{ rotateX: rx, rotateY: ry, transformPerspective: 1000 }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface/40 transition-colors duration-300 hover:border-accent/40"
+      className="card-bleed group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface/40"
     >
       <Link href={`/projects/${project.slug}`} className="relative block h-48 overflow-hidden">
         {project.image ? (
@@ -39,8 +39,9 @@ export default function ProjectCard({ project }: { project: Project }) {
             className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-2 via-surface to-void">
-            <span className="font-display text-5xl text-bone/15">{project.title}</span>
+          <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-2 via-surface to-void">
+            <Skull className="absolute h-24 w-24 text-accent/[0.07]" strokeWidth={0.5} />
+            <span className="relative font-display text-5xl text-bone/15">{project.title}</span>
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-void via-transparent to-transparent" />

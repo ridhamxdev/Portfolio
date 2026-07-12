@@ -87,7 +87,7 @@ export default function ScrollShowcase() {
           <Link
             key={p.slug}
             href={`/projects/${p.slug}`}
-            className="showcase-card group relative flex h-[68vh] w-[84vw] max-w-[640px] shrink-0 flex-col overflow-hidden rounded-3xl border border-line bg-surface"
+            className="showcase-card card-bleed group relative flex h-[68vh] w-[84vw] max-w-[640px] shrink-0 flex-col overflow-hidden rounded-3xl border border-line bg-surface"
           >
             <div className="relative flex-1 overflow-hidden">
               <Image

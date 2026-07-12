@@ -323,6 +323,19 @@ body::after {
   50% { transform: translateY(-8px) rotate(0.6deg); }
 }
 
+/* Any interactive surface bleeds when touched — a consistent hover across every
+   card, so the whole site reacts the same unsettling way. */
+.card-bleed {
+  transition: box-shadow 0.45s ease, border-color 0.45s ease;
+}
+.card-bleed:hover {
+  border-color: rgba(193, 18, 31, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(193, 18, 31, 0.28),
+    0 18px 60px -18px rgba(193, 18, 31, 0.5),
+    inset 0 0 44px -22px rgba(193, 18, 31, 0.6);
+}
+
 .horror-glitch {
   animation: textGlitch 5.5s steps(1) infinite;
 }

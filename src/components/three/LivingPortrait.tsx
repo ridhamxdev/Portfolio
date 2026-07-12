@@ -104,25 +104,36 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
     };
   }, [scene]);
 
-  // Gore treatment: drain the skin to a corpse tint with a faint fevered flush,
-  // and hollow the eyes to dark, wet sockets. Runs once when the scene loads.
+  // Spectral treatment: bleach the skin to a translucent, cold-glowing apparition
+  // and set the hollow eyes faintly alight — a ghost, not a corpse. Skin materials
+  // are kept so their opacity can flicker like a fading spirit each frame.
+  const skinMats = useRef<MeshStandardMaterial[]>([]);
   useEffect(() => {
+    skinMats.current = [];
     scene.traverse((o) => {
       const m = o as Mesh;
       const mat = m.material as MeshStandardMaterial | undefined;
       if (!mat || !("color" in mat)) return;
       const name = o.name.toLowerCase();
       if (name.includes("eye")) {
-        mat.color.set("#1a0405"); // sunken, near-black eyes
-        mat.roughness = 0.15; // wet glint
+        mat.color.set("#05080c"); // black hollows...
+        mat.roughness = 0.1;
         mat.metalness = 0.1;
-        if ("emissive" in mat) mat.emissive.set("#3a0206");
+        if ("emissive" in mat) {
+          mat.emissive.set("#7fc4e6"); // ...with a cold spectral light behind them
+          mat.emissiveIntensity = 0.7;
+        }
       } else {
-        mat.color.multiplyScalar(0.82);
-        mat.color.lerp(new Color("#b7c2c4"), 0.35); // grey morgue pallor
-        if ("emissive" in mat) mat.emissive.set("#2a0507"); // fevered blood flush
-        mat.emissiveIntensity = 0.35;
-        mat.roughness = Math.min(1, (mat.roughness ?? 0.7) + 0.15);
+        mat.color.multiplyScalar(0.9);
+        mat.color.lerp(new Color("#cfdbe4"), 0.6); // pale, drained, moonlit
+        if ("emissive" in mat) mat.emissive.set("#3f6f88"); // cold inner glow
+        mat.emissiveIntensity = 0.6;
+        mat.roughness = 0.55;
+        mat.metalness = 0;
+        mat.transparent = true;
+        mat.opacity = 0.72; // see-through, like a projection
+        mat.depthWrite = false;
+        skinMats.current.push(mat);
       }
       mat.needsUpdate = true;
     });
@@ -133,6 +144,103 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
   // Twitch: brief involuntary head jerk at rare intervals — the body glitches.
   const twitch = useRef({ next: 4, t: 0, x: 0, y: 0 });
   const time = useRef(0);
+
+  // Laugh: on a loop the spirit throws its head back and cackles — the jaw pulses
+  // in time with a synthesised maniacal laugh, echoing into the dark.
+  const laugh = useRef({
+    active: false,
+    t: 0,
+    next: 7 + Math.random() * 6, // first cackle a few seconds in
+    bursts: [] as { at: number; dur: number; amp: number }[],
+    total: 0,
+  });
+  // Web Audio is gated behind a user gesture; build/resume the context on the
+  // first interaction and keep an echo (delay) send for a ghostly tail.
+  const audio = useRef<{ ctx: AudioContext | null; echo: DelayNode | null }>({
+    ctx: null,
+    echo: null,
+  });
+  useEffect(() => {
+    const ensure = () => {
+      const a = audio.current;
+      if (a.ctx) {
+        a.ctx.resume?.();
+        return;
+      }
+      try {
+        const AC =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext })
+            .webkitAudioContext;
+        const ctx = new AC();
+        const echo = ctx.createDelay(1.0);
+        echo.delayTime.value = 0.23;
+        const fb = ctx.createGain();
+        fb.gain.value = 0.36; // regenerating tail
+        const wet = ctx.createGain();
+        wet.gain.value = 0.5;
+        echo.connect(fb).connect(echo);
+        echo.connect(wet).connect(ctx.destination);
+        audio.current = { ctx, echo };
+      } catch {}
+    };
+    window.addEventListener("pointerdown", ensure);
+    window.addEventListener("keydown", ensure);
+    window.addEventListener("scroll", ensure, { passive: true });
+    return () => {
+      window.removeEventListener("pointerdown", ensure);
+      window.removeEventListener("keydown", ensure);
+      window.removeEventListener("scroll", ensure);
+    };
+  }, []);
+
+  // Schedule a cackle: build the rhythm of "ha" bursts, then voice them.
+  const triggerLaugh = () => {
+    const bursts: { at: number; dur: number; amp: number }[] = [];
+    const n = 6 + Math.floor(Math.random() * 4); // 6–9 "ha"s
+    let cursor = 0.12;
+    for (let i = 0; i < n; i++) {
+      const dur = 0.12 + Math.random() * 0.08;
+      bursts.push({ at: cursor, dur, amp: 0.7 + Math.random() * 0.3 });
+      cursor += dur + 0.05 + Math.random() * 0.06;
+    }
+    const lg = laugh.current;
+    lg.active = true;
+    lg.t = 0;
+    lg.bursts = bursts;
+    lg.total = cursor + 0.5; // let the echo hang
+
+    const a = audio.current;
+    if (!a.ctx) return;
+    a.ctx.resume?.();
+    const ctx = a.ctx;
+    const t0 = ctx.currentTime + 0.02;
+    const base = 150 + Math.random() * 60;
+    bursts.forEach((b, i) => {
+      const t = t0 + b.at;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.3 * b.amp, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + b.dur);
+      g.connect(ctx.destination);
+      if (a.echo) g.connect(a.echo);
+      const bp = ctx.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.value = 720 - i * 22; // vowel darkens as it descends
+      bp.Q.value = 4;
+      bp.connect(g);
+      const f = base * Math.pow(0.94, i); // each "ha" drops in pitch — menacing
+      [f, f * 1.006, f * 1.5].forEach((freq, k) => {
+        const o = ctx.createOscillator();
+        o.type = k === 2 ? "triangle" : "sawtooth";
+        o.frequency.setValueAtTime(freq * 1.06, t);
+        o.frequency.exponentialRampToValueAtTime(freq * 0.9, t + b.dur);
+        o.connect(bp);
+        o.start(t);
+        o.stop(t + b.dur + 0.02);
+      });
+    });
+  };
 
   // Track the cursor across the WHOLE page, not just this canvas. `state.pointer`
   // only updates while the mouse is over the small hero canvas, so the stare would
@@ -178,9 +286,34 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
     tw.x = MathUtils.lerp(tw.x, 0, 0.08);
     tw.y = MathUtils.lerp(tw.y, 0, 0.08);
 
+    // --- laugh scheduler: idle, then cackle, then fall quiet and re-arm
+    const lg = laugh.current;
+    let laughJaw = 0; // 0..1 jaw drive from the current "ha"
+    let laughOn = 0; // 0/1 whether we're mid-cackle (head thrown back)
+    if (lg.active) {
+      lg.t += delta;
+      for (const bu of lg.bursts) {
+        const d = lg.t - bu.at;
+        if (d > -0.04 && d < bu.dur) {
+          laughJaw = Math.max(laughJaw, Math.sin((d / bu.dur) * Math.PI) * bu.amp);
+        }
+      }
+      laughOn = 1;
+      if (lg.t >= lg.total) {
+        lg.active = false;
+        lg.t = 0;
+        lg.next = 15 + Math.abs(Math.sin(t * 4.3)) * 20; // ~15–35s until the next
+      }
+    } else {
+      lg.next -= delta;
+      if (lg.next <= 0) triggerLaugh();
+    }
+
     if (root.current) {
-      // shallow, laboured breathing + slow tracking head turn + micro twitch
+      // shallow, laboured breathing + slow tracking head turn + micro twitch,
+      // plus a head thrown BACK and bobbing while it laughs
       const breathe = Math.sin(t * 0.85) * 0.02;
+      const headBack = MathUtils.lerp(0, 0.16, laughOn) + laughJaw * 0.05;
       root.current.rotation.y = MathUtils.lerp(
         root.current.rotation.y,
         gazeX * 0.38 + Math.sin(t * 0.31) * 0.03 + tw.x,
@@ -188,11 +321,26 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       );
       root.current.rotation.x = MathUtils.lerp(
         root.current.rotation.x,
-        -gazeY * 0.22 + breathe + tw.y,
-        0.075
+        -gazeY * 0.22 + breathe + tw.y + headBack,
+        laughOn ? 0.2 : 0.075
       );
       root.current.position.y = Math.sin(t * 0.85) * 0.01;
-      root.current.rotation.z = Math.sin(t * 0.19) * 0.03 + tw.x * 0.5; // faint head tilt
+      root.current.rotation.z =
+        Math.sin(t * 0.19) * 0.03 + tw.x * 0.5 + laughJaw * 0.04; // faint tilt + shudder
+    }
+
+    // --- spectral flicker: the apparition wavers, dimming and surging like a
+    // failing projection, and burns brighter as it laughs
+    if (skinMats.current.length) {
+      const flick =
+        0.66 +
+        Math.sin(t * 3.1) * 0.05 +
+        (Math.sin(t * 17.0) > 0.86 ? -0.14 : 0) +
+        laughOn * 0.08;
+      for (const mat of skinMats.current) {
+        mat.opacity = MathUtils.clamp(flick, 0.4, 0.86);
+        mat.emissiveIntensity = 0.55 + laughOn * 0.5 + laughJaw * 0.4;
+      }
     }
 
     // --- blinking (with occasional snap double-blink)
@@ -226,17 +374,24 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       // --- expression: resting dread (jaw cracked open, brows drawn down),
       // deepening into a wide-eyed menace as the hero scrolls away.
       const s = scrollExpr ? heroScroll.p : 0;
-      const jaw = 0.05 + s * 0.14; // mouth hangs slightly, then more
+      // jaw hangs at rest, opens with scroll, and gapes in time with each "ha"
+      const jaw = 0.05 + s * 0.14 + laughJaw * 0.8;
       const browDown = 0.1 + s * 0.4; // furrow — set via browInnerUp negative feel
       const wide = 0.08 + s * 0.5; // eyes widen unnaturally on scroll
-      if (rig.jaw >= 0) infl[rig.jaw] = MathUtils.lerp(infl[rig.jaw] ?? 0, jaw, 0.05);
+      // a laugh is a rictus grin, not a friendly one — force the smile up mid-cackle
+      const grin = laughOn * (0.55 + laughJaw * 0.35);
+      const jawEase = laughOn ? 0.55 : 0.05; // snap the jaw during the laugh
+      if (rig.jaw >= 0) infl[rig.jaw] = MathUtils.lerp(infl[rig.jaw] ?? 0, jaw, jawEase);
       // browInnerUp lifted only a touch; rely on wide eyes for menace
       if (rig.browUp >= 0) infl[rig.browUp] = MathUtils.lerp(infl[rig.browUp] ?? 0, browDown * 0.3, 0.05);
       if (rig.wide.l >= 0) infl[rig.wide.l] = MathUtils.lerp(infl[rig.wide.l] ?? 0, wide, 0.05);
       if (rig.wide.r >= 0) infl[rig.wide.r] = MathUtils.lerp(infl[rig.wide.r] ?? 0, wide, 0.05);
-      // kill any resting smile so it never reads friendly
-      if (rig.smile.l >= 0) infl[rig.smile.l] = MathUtils.lerp(infl[rig.smile.l] ?? 0, 0, 0.1);
-      if (rig.smile.r >= 0) infl[rig.smile.r] = MathUtils.lerp(infl[rig.smile.r] ?? 0, 0, 0.1);
+      // eyes crush to squinting slits while it cackles
+      if (rig.squint.l >= 0) infl[rig.squint.l] = MathUtils.lerp(infl[rig.squint.l] ?? 0, laughOn * 0.6, 0.2);
+      if (rig.squint.r >= 0) infl[rig.squint.r] = MathUtils.lerp(infl[rig.squint.r] ?? 0, laughOn * 0.6, 0.2);
+      // grin only appears mid-laugh — a rictus — otherwise stays flat and cold
+      if (rig.smile.l >= 0) infl[rig.smile.l] = MathUtils.lerp(infl[rig.smile.l] ?? 0, grin, 0.25);
+      if (rig.smile.r >= 0) infl[rig.smile.r] = MathUtils.lerp(infl[rig.smile.r] ?? 0, grin, 0.25);
     }
   });
 

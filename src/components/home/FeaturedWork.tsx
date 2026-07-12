@@ -57,7 +57,7 @@ export default function FeaturedWork() {
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div className="min-w-0">
-                <h3 className="font-display text-3xl leading-none text-bone transition-transform duration-300 group-hover:translate-x-2 sm:text-5xl">
+                <h3 className="font-display text-3xl leading-none text-bone transition-all duration-300 group-hover:translate-x-2 group-hover:text-accent group-hover:[text-shadow:0_0_30px_rgba(193,18,31,0.55)] sm:text-5xl">
                   {p.title}
                 </h3>
                 <p className="mt-2.5 truncate font-mono text-[0.7rem] uppercase tracking-[0.14em] text-muted">
