@@ -6,8 +6,6 @@ import {
   useGLTF,
   Environment,
   Lightformer,
-  ContactShadows,
-  Bounds,
   OrbitControls,
 } from "@react-three/drei";
 import {
@@ -39,6 +37,14 @@ const BODY_PARTS = [
   "Wolf3D_Outfit_Bottom",
   "Wolf3D_Outfit_Footwear",
 ];
+
+// Head framing. The RPM head sits ~1.6m up its (removed) body; we scale it up and
+// drop the whole group so the FACE — not the neck — fills the frame. We aim the
+// camera at eye level rather than auto-fitting the head+neck box (which framed the
+// neck and made the camera look up the nose). Tuned by screenshot.
+const FACE_SCALE = 2.0;
+const FACE_Y = -3.34; // ≈ -(eye height) * FACE_SCALE → eyes land ~1/3 down the frame
+const HEAD_PITCH = 0.16; // constant forward tilt so the face meets the viewer
 
 useGLTF.preload(MODEL);
 
@@ -332,7 +338,7 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       );
       rig.head.rotation.x = MathUtils.lerp(
         rig.head.rotation.x,
-        bH.x - gazeY * 0.2 + breathe + tw.y - headBack,
+        bH.x + HEAD_PITCH - gazeY * 0.2 + breathe + tw.y - headBack,
         laughOn ? 0.2 : 0.075
       );
       rig.head.rotation.z = MathUtils.lerp(
@@ -343,7 +349,7 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
     }
     if (root.current) {
       // a slow, ghostly vertical drift for the floating head
-      root.current.position.y = -0.15 + Math.sin(t * 0.8) * 0.012;
+      root.current.position.y = FACE_Y + Math.sin(t * 0.8) * 0.012;
     }
 
     // --- a faint living warmth under the skin, lifting a touch as it laughs.
@@ -414,9 +420,10 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
     }
   });
 
-  // Body removed in the rig memo; <Bounds> auto-frames the remaining head.
+  // Body removed in the rig memo; scale up and drop the group so the face — not
+  // the neck — sits at camera level (see FACE_SCALE / FACE_Y).
   return (
-    <group ref={root} position={[0, -0.15, 0]} rotation={[0, 0, 0]}>
+    <group ref={root} position={[0, FACE_Y, 0]} scale={FACE_SCALE}>
       <primitive object={scene} />
     </group>
   );
@@ -427,7 +434,7 @@ export default function LivingPortrait({ debug = false }: { debug?: boolean }) {
     <Canvas
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: !debug, powerPreference: "high-performance" }}
-      camera={{ position: [0, 0.05, 1.35], fov: 34 }}
+      camera={{ position: [0, 0, 1.25], fov: 32 }}
       style={{ background: debug ? "#20222a" : "transparent" }}
     >
       {/* realistic 3-point lighting so the scanned skin reads as human flesh:
@@ -440,9 +447,7 @@ export default function LivingPortrait({ debug = false }: { debug?: boolean }) {
       <pointLight position={[0, -1.9, 1.3]} intensity={2} color="#8f1116" distance={7} decay={2.2} />
 
       <Suspense fallback={null}>
-        <Bounds fit clip observe margin={1.15}>
-          <Face />
-        </Bounds>
+        <Face />
         <Environment resolution={256}>
           <Lightformer form="rect" intensity={2.2} color="#fff4e8" position={[2, 2, 2]} scale={[6, 6, 1]} />
           <Lightformer form="rect" intensity={1.2} color="#8ea3bd" position={[-3, 0.5, 1.5]} scale={[5, 5, 1]} />
@@ -450,8 +455,6 @@ export default function LivingPortrait({ debug = false }: { debug?: boolean }) {
           <Lightformer form="ring" intensity={0.3} color="#141a20" position={[0, 0, -3]} scale={4} />
         </Environment>
       </Suspense>
-
-      <ContactShadows position={[0, -1.05, 0]} opacity={0.6} scale={4} blur={2.4} far={2} color="#000000" />
 
       {debug && <OrbitControls makeDefault />}
 
