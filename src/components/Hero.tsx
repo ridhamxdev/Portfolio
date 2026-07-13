@@ -8,6 +8,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Magnetic from "@/components/Magnetic";
 import { heroScroll } from "@/lib/heroScroll";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 const LivingPortrait = dynamic(() => import("@/components/three/LivingPortrait"), {
   ssr: false,
@@ -22,6 +23,7 @@ const LivingPortrait = dynamic(() => import("@/components/three/LivingPortrait")
 });
 
 export default function Hero() {
+  const { horror } = useTheme();
   const root = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: root,
@@ -77,7 +79,7 @@ export default function Hero() {
         style={{ scale: stageScale, y: stageY }}
         className="absolute inset-x-0 top-0 bottom-[30%] lg:inset-0 lg:bottom-0 lg:left-[40%]"
       >
-        <LivingPortrait />
+        <LivingPortrait horror={horror} />
       </motion.div>
 
       {/* legibility scrim — lighter on mobile so the face reads through */}

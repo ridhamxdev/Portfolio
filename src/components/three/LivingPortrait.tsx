@@ -43,8 +43,8 @@ const BODY_PARTS = [
 // camera at eye level rather than auto-fitting the head+neck box (which framed the
 // neck and made the camera look up the nose). Tuned by screenshot.
 const FACE_SCALE = 2.0;
-const FACE_Y = -3.34; // ≈ -(eye height) * FACE_SCALE → eyes land ~1/3 down the frame
-const HEAD_PITCH = 0.16; // constant forward tilt so the face meets the viewer
+const FACE_Y = -3.54; // drop the head so the neck falls below frame — face only
+const HEAD_PITCH = 0.1; // slight forward tilt so we read the face, not up the nose
 
 useGLTF.preload(MODEL);
 
@@ -56,9 +56,12 @@ function morphIndex(dict: Record<string, number>, ...names: string[]) {
   return -1;
 }
 
-function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
+function Face({ scrollExpr = true, horror = false }: { scrollExpr?: boolean; horror?: boolean }) {
   const { scene } = useGLTF(MODEL);
   const root = useRef<Group>(null);
+  // Latest theme, read inside the frame loop without stale closures.
+  const horrorRef = useRef(horror);
+  horrorRef.current = horror;
 
   // Pull out the morph meshes and the aimable eye/head bones once. Also drop the
   // body here (during render) so it's gone before <Bounds> measures the scene.
@@ -303,27 +306,35 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
     tw.x = MathUtils.lerp(tw.x, 0, 0.08);
     tw.y = MathUtils.lerp(tw.y, 0, 0.08);
 
-    // --- laugh scheduler: idle, then cackle, then fall quiet and re-arm
+    // --- laugh scheduler: idle, then cackle, then fall quiet and re-arm.
+    // HORROR ONLY — in normal mode the face never laughs (no jaw, no cackle audio).
     const lg = laugh.current;
     let laughJaw = 0; // 0..1 jaw drive from the current "ha"
     let laughOn = 0; // 0/1 whether we're mid-cackle (head thrown back)
-    if (lg.active) {
-      lg.t += delta;
-      for (const bu of lg.bursts) {
-        const d = lg.t - bu.at;
-        if (d > -0.04 && d < bu.dur) {
-          laughJaw = Math.max(laughJaw, Math.sin((d / bu.dur) * Math.PI) * bu.amp);
+    if (horrorRef.current) {
+      if (lg.active) {
+        lg.t += delta;
+        for (const bu of lg.bursts) {
+          const d = lg.t - bu.at;
+          if (d > -0.04 && d < bu.dur) {
+            laughJaw = Math.max(laughJaw, Math.sin((d / bu.dur) * Math.PI) * bu.amp);
+          }
         }
+        laughOn = 1;
+        if (lg.t >= lg.total) {
+          lg.active = false;
+          lg.t = 0;
+          lg.next = 15 + Math.abs(Math.sin(t * 4.3)) * 20; // ~15–35s until the next
+        }
+      } else {
+        lg.next -= delta;
+        if (lg.next <= 0) triggerLaugh();
       }
-      laughOn = 1;
-      if (lg.t >= lg.total) {
-        lg.active = false;
-        lg.t = 0;
-        lg.next = 15 + Math.abs(Math.sin(t * 4.3)) * 20; // ~15–35s until the next
-      }
-    } else {
-      lg.next -= delta;
-      if (lg.next <= 0) triggerLaugh();
+    } else if (lg.active) {
+      // toggled out of horror mid-cackle — cut it short and re-arm
+      lg.active = false;
+      lg.t = 0;
+      lg.next = 15;
     }
 
     // --- head turn: pivot the actual neck/head bone so the body would stay put,
@@ -397,13 +408,15 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
       set(rig.blink.l, b.v);
       set(rig.blink.r, b.v);
 
-      // --- expression: resting dread (jaw cracked open, brows drawn down),
-      // deepening into a wide-eyed menace as the hero scrolls away.
-      const s = scrollExpr ? heroScroll.p : 0;
-      // jaw hangs at rest, opens with scroll, and gapes in time with each "ha"
-      const jaw = 0.05 + s * 0.14 + laughJaw * 0.8;
-      const browDown = 0.1 + s * 0.4; // furrow — set via browInnerUp negative feel
-      const wide = 0.08 + s * 0.5; // eyes widen unnaturally on scroll
+      // --- expression: HORROR rests in dread (jaw cracked, brows drawn down)
+      // and deepens into wide-eyed menace on scroll; NORMAL rests calm & neutral,
+      // just blinking and following the cursor.
+      const hz = horrorRef.current;
+      const s = scrollExpr && hz ? heroScroll.p : 0;
+      // jaw hangs at rest (horror only), opens with scroll, gapes with each "ha"
+      const jaw = (hz ? 0.05 : 0) + s * 0.14 + laughJaw * 0.8;
+      const browDown = (hz ? 0.1 : 0) + s * 0.4; // furrow — via browInnerUp
+      const wide = (hz ? 0.08 : 0) + s * 0.5; // eyes widen unnaturally on scroll
       // a laugh is a rictus grin, not a friendly one — force the smile up mid-cackle
       const grin = laughOn * (0.55 + laughJaw * 0.35);
       const jawEase = laughOn ? 0.55 : 0.05; // snap the jaw during the laugh
@@ -429,12 +442,18 @@ function Face({ scrollExpr = true }: { scrollExpr?: boolean }) {
   );
 }
 
-export default function LivingPortrait({ debug = false }: { debug?: boolean }) {
+export default function LivingPortrait({
+  debug = false,
+  horror = false,
+}: {
+  debug?: boolean;
+  horror?: boolean;
+}) {
   return (
     <Canvas
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: !debug, powerPreference: "high-performance" }}
-      camera={{ position: [0, 0, 1.25], fov: 32 }}
+      camera={{ position: [0, 0.05, 1.32], fov: 32 }}
       style={{ background: debug ? "#20222a" : "transparent" }}
     >
       {/* realistic 3-point lighting so the scanned skin reads as human flesh:
@@ -447,7 +466,7 @@ export default function LivingPortrait({ debug = false }: { debug?: boolean }) {
       <pointLight position={[0, -1.9, 1.3]} intensity={2} color="#8f1116" distance={7} decay={2.2} />
 
       <Suspense fallback={null}>
-        <Face />
+        <Face horror={horror} />
         <Environment resolution={256}>
           <Lightformer form="rect" intensity={2.2} color="#fff4e8" position={[2, 2, 2]} scale={[6, 6, 1]} />
           <Lightformer form="rect" intensity={1.2} color="#8ea3bd" position={[-3, 0.5, 1.5]} scale={[5, 5, 1]} />
