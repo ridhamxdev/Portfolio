@@ -336,7 +336,8 @@ body::after {
     inset 0 0 44px -22px rgba(193, 18, 31, 0.6);
 }
 
-.horror-glitch {
+/* The hero word only tears/glitches in horror mode; default sits still. */
+[data-theme="horror"] .horror-glitch {
   animation: textGlitch 5.5s steps(1) infinite;
 }
 .pulse-blood {

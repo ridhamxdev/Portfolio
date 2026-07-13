@@ -9,8 +9,28 @@ import {
 } from "framer-motion";
 import { Skull } from "lucide-react";
 import BloodDrip from "@/components/horror/BloodDrip";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
-const items = [
+// Pure tech terms — the default marquee.
+const baseItems = [
+  "Distributed systems",
+  "Real-time",
+  "Event-driven",
+  "AI agents",
+  "Machine learning",
+  "Microservices",
+  "Socket.io",
+  "NestJS",
+  "Redis",
+  "RabbitMQ",
+  "Prisma",
+  "Next.js",
+  "PostgreSQL",
+  "Docker",
+];
+
+// Macabre phrases spliced in only when horror mode is on.
+const horrorItems = [
   "Distributed systems",
   "Raised from the dead",
   "Real-time",
@@ -31,6 +51,8 @@ const items = [
 ];
 
 export default function Marquee() {
+  const { horror } = useTheme();
+  const items = horror ? horrorItems : baseItems;
   const { scrollY } = useScroll();
   const velocity = useVelocity(scrollY);
   const smooth = useSpring(velocity, { stiffness: 300, damping: 50 });
@@ -43,7 +65,11 @@ export default function Marquee() {
           {[...items, ...items].map((t, i) => (
             <span key={i} className="flex items-center gap-10 whitespace-nowrap">
               <span className="font-display text-2xl text-bone/80 sm:text-3xl">{t}</span>
-              <Skull className="h-5 w-5 shrink-0 text-accent/70" strokeWidth={1.4} />
+              {horror ? (
+                <Skull className="h-5 w-5 shrink-0 text-accent/70" strokeWidth={1.4} />
+              ) : (
+                <span aria-hidden className="shrink-0 text-lg text-accent/60">✦</span>
+              )}
             </span>
           ))}
         </div>

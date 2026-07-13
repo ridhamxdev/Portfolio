@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import Magnetic from "@/components/Magnetic";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 const links = [
   { label: "Work", href: "/projects" },
@@ -100,6 +101,8 @@ export default function Nav() {
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent shadow-[0_0_8px_rgba(193,18,31,0.8)]" />
               Bengaluru {time}
             </span>
+
+            <ThemeToggle />
 
             <Magnetic className="inline-block">
               <Link

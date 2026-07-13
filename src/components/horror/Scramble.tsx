@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 const GLYPHS = "!<>-_\\/[]{}—=+*^?#01†✝⸸☠";
 
@@ -17,6 +18,7 @@ export default function Scramble({
   as?: keyof React.JSX.IntrinsicElements;
   once?: boolean;
 }) {
+  const { horror } = useTheme();
   const ref = useRef<HTMLElement>(null);
   const [display, setDisplay] = useState(text);
   const raf = useRef(0);
@@ -25,7 +27,9 @@ export default function Scramble({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Only horror mode gets the cursed decode; default shows plain text.
+    if (horror === false || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.textContent = text;
       setDisplay(text);
       return;
     }
@@ -76,7 +80,7 @@ export default function Scramble({
       io.disconnect();
       cancelAnimationFrame(raf.current);
     };
-  }, [text, once]);
+  }, [text, once, horror]);
 
   return (
     // @ts-expect-error dynamic tag with ref

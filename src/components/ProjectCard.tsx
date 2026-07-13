@@ -5,8 +5,10 @@ import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowUpRight, Github, Skull } from "lucide-react";
 import type { Project } from "@/data/projects";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 export default function ProjectCard({ project }: { project: Project }) {
+  const { horror } = useTheme();
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
   const rx = useSpring(useTransform(py, [0, 1], [6, -6]), { stiffness: 200, damping: 20 });
@@ -40,7 +42,7 @@ export default function ProjectCard({ project }: { project: Project }) {
           />
         ) : (
           <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-2 via-surface to-void">
-            <Skull className="absolute h-24 w-24 text-accent/[0.07]" strokeWidth={0.5} />
+            {horror && <Skull className="absolute h-24 w-24 text-accent/[0.07]" strokeWidth={0.5} />}
             <span className="relative font-display text-5xl text-bone/15">{project.title}</span>
           </div>
         )}

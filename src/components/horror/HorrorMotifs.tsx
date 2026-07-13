@@ -1,6 +1,7 @@
 "use client";
 
 import { Skull, Bone } from "lucide-react";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 // A colossal skull bleeding through the dark — a watermark behind a section.
 export function SkullWatermark({
@@ -10,6 +11,8 @@ export function SkullWatermark({
   className?: string;
   size?: number;
 }) {
+  const { horror } = useTheme();
+  if (!horror) return null;
   return (
     <div
       aria-hidden
@@ -26,6 +29,8 @@ export function SkullWatermark({
 
 // Crossed bones — a small skeletal divider glyph.
 export function Crossbones({ className = "" }: { className?: string }) {
+  const { horror } = useTheme();
+  if (!horror) return null;
   return (
     <span aria-hidden className={`relative inline-flex h-5 w-5 ${className}`}>
       <Bone className="absolute inset-0 h-5 w-5 rotate-45 text-bone/40" strokeWidth={1.5} />

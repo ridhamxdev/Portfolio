@@ -1,5 +1,7 @@
 "use client";
 
+import { useTheme } from "@/components/theme/ThemeProvider";
+
 // A pool of blood clinging to an edge, with droplets that swell and fall.
 // Drop it as the last child of a `relative` container; it hangs from the top.
 export default function BloodDrip({
@@ -9,6 +11,8 @@ export default function BloodDrip({
   className?: string;
   flip?: boolean;
 }) {
+  const { horror } = useTheme();
+  if (!horror) return null;
   const drops = [
     { left: "8%", delay: "0s", dur: "5.5s", scale: 1 },
     { left: "22%", delay: "2.1s", dur: "6.8s", scale: 0.7 },

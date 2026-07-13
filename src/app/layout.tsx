@@ -7,11 +7,8 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Background from "@/components/Background";
 import ScrollProgress from "@/components/ScrollProgress";
-import HorrorAudio from "@/components/horror/HorrorAudio";
-import DreadOverlay from "@/components/horror/DreadOverlay";
-import JumpScare from "@/components/horror/JumpScare";
-import BloodCanvas from "@/components/horror/BloodCanvas";
-import { SkeletonHand } from "@/components/horror/Skeletons";
+import { ThemeProvider, themeNoFlashScript } from "@/components/theme/ThemeProvider";
+import HorrorLayer from "@/components/horror/HorrorLayer";
 
 const instrument = Instrument_Serif({
   weight: "400",
@@ -69,23 +66,22 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="normal"
       className={`${instrument.variable} ${hanken.variable} ${jetbrains.variable}`}
     >
       <body className="bg-void text-bone antialiased">
-        <Background />
-        <DreadOverlay />
-        <BloodCanvas />
-        <SkeletonHand side="left" />
-        <SkeletonHand side="right" />
-        <Cursor />
-        <ScrollProgress />
-        <Nav />
-        <SmoothScroll>
-          {children}
-          <Footer />
-        </SmoothScroll>
-        <HorrorAudio />
-        <JumpScare />
+        <script dangerouslySetInnerHTML={{ __html: themeNoFlashScript }} />
+        <ThemeProvider>
+          <Background />
+          <HorrorLayer />
+          <Cursor />
+          <ScrollProgress />
+          <Nav />
+          <SmoothScroll>
+            {children}
+            <Footer />
+          </SmoothScroll>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 // Dual cursor: a precise dot + a lagging ring that swells over interactive targets.
 export default function Cursor() {
+  const { horror } = useTheme();
   const dot = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
@@ -20,19 +22,22 @@ export default function Cursor() {
     let raf = 0;
 
     // Blood trail: a small pool of droplets that bleed out behind the cursor.
+    // Horror mode only — the default cursor is just the clean dot + ring.
     const trail: HTMLDivElement[] = [];
     const TRAIL = 6;
-    for (let i = 0; i < TRAIL; i++) {
-      const d = document.createElement("div");
-      d.className = "cursor-blood pointer-events-none fixed left-0 top-0 z-[199] rounded-full";
-      const s = 6 - i * 0.7;
-      d.style.width = `${s}px`;
-      d.style.height = `${s}px`;
-      d.style.background = "radial-gradient(circle, #e0413a, #6d0a10)";
-      d.style.opacity = "0";
-      d.style.willChange = "transform, opacity";
-      document.body.appendChild(d);
-      trail.push(d);
+    if (horror) {
+      for (let i = 0; i < TRAIL; i++) {
+        const d = document.createElement("div");
+        d.className = "cursor-blood pointer-events-none fixed left-0 top-0 z-[199] rounded-full";
+        const s = 6 - i * 0.7;
+        d.style.width = `${s}px`;
+        d.style.height = `${s}px`;
+        d.style.background = "radial-gradient(circle, #e0413a, #6d0a10)";
+        d.style.opacity = "0";
+        d.style.willChange = "transform, opacity";
+        document.body.appendChild(d);
+        trail.push(d);
+      }
     }
     const hist: { x: number; y: number }[] = [];
 
@@ -83,7 +88,7 @@ export default function Cursor() {
       window.removeEventListener("mouseover", over);
       trail.forEach((d) => d.remove());
     };
-  }, []);
+  }, [horror]);
 
   if (!enabled) return null;
 

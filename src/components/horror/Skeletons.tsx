@@ -1,5 +1,7 @@
 "use client";
 
+import { useTheme } from "@/components/theme/ThemeProvider";
+
 // Bone geometry drawn from primitives — no external models. A capsule bone with
 // bulged joint knuckles at each end, the unit every skeletal shape is built from.
 function Bone({
@@ -95,6 +97,8 @@ export function RibcageWatermark({
   className?: string;
   size?: number;
 }) {
+  const { horror } = useTheme();
+  if (!horror) return null;
   const ribs = [0, 1, 2, 3, 4, 5];
   return (
     <div
