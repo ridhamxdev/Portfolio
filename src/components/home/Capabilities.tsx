@@ -23,7 +23,7 @@ export default function Capabilities() {
   return (
     <section className="mx-auto max-w-[1440px] px-5 py-28 sm:px-10">
       <Io>
-        <h2 className="display-lg rv-mask max-w-3xl text-balance">
+        <h2 className="display-lg rv-mask rv-cast max-w-3xl text-balance">
           What I build<span className="text-accent">.</span>
         </h2>
       </Io>

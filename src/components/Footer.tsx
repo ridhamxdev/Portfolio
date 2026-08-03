@@ -22,7 +22,7 @@ export default function Footer() {
         </p>
 
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-          <h2 className="display-lg max-w-3xl text-balance">
+          <h2 className="display-lg rv-cast max-w-3xl text-balance">
             <span className="rv-mask block">Let&apos;s build something</span>
             <span className="rv-mask block" style={{ "--rv-d": "0.12s" } as React.CSSProperties}>
               that actually <span className="text-accent">ships</span>.
