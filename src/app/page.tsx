@@ -1,20 +1,16 @@
 import Hero from "@/components/Hero";
 import Marquee from "@/components/home/Marquee";
+import WorkRail from "@/components/home/WorkRail";
 import Capabilities from "@/components/home/Capabilities";
-import FeaturedWork from "@/components/home/FeaturedWork";
-import ScrollShowcase from "@/components/home/ScrollShowcase";
 import Stack from "@/components/home/Stack";
-import Reveal from "@/components/Reveal";
-import Parallax from "@/components/Parallax";
 import Counter from "@/components/Counter";
-import { SkullWatermark } from "@/components/horror/HorrorMotifs";
-import { RibcageWatermark } from "@/components/horror/Skeletons";
+import Io from "@/components/system/Io";
 
 const stats = [
-  { value: "17", label: "Projects shipped", drift: 34 },
-  { value: "11", label: "Live deployments", drift: 12 },
-  { value: "05", label: "Problem domains", drift: 26 },
-  { value: "'26", label: "Open to work", drift: 8 },
+  { value: "17", label: "Projects shipped" },
+  { value: "11", label: "Live deployments" },
+  { value: "05", label: "Problem domains" },
+  { value: "'26", label: "Open to work" },
 ];
 
 export default function Home() {
@@ -22,27 +18,24 @@ export default function Home() {
     <main className="relative z-10">
       <Hero />
       <Marquee />
+      <WorkRail />
       <Capabilities />
-      <ScrollShowcase />
-      <FeaturedWork />
 
-      <section className="relative mx-auto max-w-[1400px] px-5 sm:px-8">
-        <SkullWatermark size={620} />
-        <RibcageWatermark size={560} className="translate-y-24" />
-        <Reveal>
-          <div className="relative grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="bg-void px-6 py-10 text-center">
-                <Parallax speed={s.drift}>
-                  <Counter value={s.value} className="font-display text-5xl text-bone sm:text-6xl" />
-                  <div className="mt-3 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted">
-                    {s.label}
-                  </div>
-                </Parallax>
+      <section className="mx-auto max-w-[1440px] px-5 pb-28 sm:px-10">
+        <Io className="relative grid grid-cols-2 md:grid-cols-4">
+          <span className="rv-rule absolute inset-x-0 top-0 block h-px bg-line-strong" />
+          {stats.map((s, i) => (
+            <div key={s.label} className="border-line px-2 py-12 text-center md:border-l md:first:border-l-0">
+              <div className="rv-fade" style={{ "--rv-d": `${i * 0.1}s` } as React.CSSProperties}>
+                <Counter value={s.value} className="display-lg text-ink" />
+                <div className="mt-3 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted">
+                  {s.label}
+                </div>
               </div>
-            ))}
-          </div>
-        </Reveal>
+            </div>
+          ))}
+          <span className="rv-rule absolute inset-x-0 bottom-0 block h-px bg-line-strong" style={{ "--rv-d": "0.2s" } as React.CSSProperties} />
+        </Io>
       </section>
 
       <Stack />

@@ -1,85 +1,67 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import Magnetic from "@/components/Magnetic";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import ThemeToggle from "@/components/theme/ThemeToggle";
+import { getLenis } from "@/lib/lenis";
 
 const links = [
   { label: "Work", href: "/projects" },
   { label: "About", href: "/about" },
+  { label: "Resume", href: "/resume" },
 ];
 
 export default function Nav() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
-  const [time, setTime] = useState("");
+  const { scrollY } = useScroll();
 
-  useEffect(() => {
-    let last = 0;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 24);
-      setVisible(y < 110 || y < last);
-      last = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const fmt = () =>
-      new Date().toLocaleTimeString("en-GB", {
-        timeZone: "Asia/Kolkata",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    setTime(fmt());
-    const id = setInterval(() => setTime(fmt()), 15000);
-    return () => clearInterval(id);
-  }, []);
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const prev = scrollY.getPrevious() ?? 0;
+    setScrolled(y > 24);
+    setVisible(y < 110 || y < prev);
+  });
 
   return (
     <motion.header
-      initial={{ y: -90 }}
-      animate={{ y: visible ? 0 : -120 }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-x-0 top-0 z-[100]"
+      initial={{ y: 0 }}
+      animate={{ y: visible ? 0 : -96 }}
+      transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+      className="no-print fixed inset-x-0 top-0 z-[100]"
+      onFocusCapture={() => setVisible(true)}
     >
       <div
         className={`transition-colors duration-500 ${
-          scrolled ? "border-b border-line bg-void/70 backdrop-blur-xl" : ""
+          scrolled ? "border-b border-line bg-bg/95" : ""
         }`}
       >
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-5 py-4 sm:px-8">
-          {/* wordmark */}
-          <Link href="/" aria-label="Home" className="group flex items-center gap-2.5">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-60 group-hover:animate-ping" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-            </span>
-            <span className="font-display text-lg leading-none text-bone transition-colors group-hover:text-accent sm:text-xl">
-              Ridham Goyal
-            </span>
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-4 sm:px-10">
+          <Link
+            href="/"
+            aria-label="Home"
+            className="display-md whitespace-nowrap text-[0.85rem] uppercase leading-none tracking-tight text-ink transition-colors duration-300 hover:text-accent sm:text-[1.05rem]"
+          >
+            Ridham Goyal
           </Link>
 
-          {/* right cluster */}
-          <div className="flex items-center gap-2 sm:gap-6">
-            <nav className="flex items-center gap-0.5 sm:gap-4">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <nav className="flex items-center">
               {links.map((l) => {
                 const active = pathname.startsWith(l.href);
                 return (
                   <Link
                     key={l.href}
                     href={l.href}
-                    className="group relative px-2 py-1 font-mono text-[0.7rem] uppercase tracking-[0.16em]"
+                    className="group relative px-2.5 py-1 font-mono text-[0.7rem] uppercase tracking-[0.16em] sm:px-3"
                   >
                     <span
                       className={
-                        active ? "text-bone" : "text-muted transition-colors group-hover:text-bone"
+                        active
+                          ? "text-ink"
+                          : "text-muted transition-colors duration-300 group-hover:text-ink"
                       }
                     >
                       {l.label}
@@ -87,31 +69,29 @@ export default function Nav() {
                     {active && (
                       <motion.span
                         layoutId="nav-active"
-                        className="absolute -bottom-0.5 left-2 right-2 h-px bg-accent"
+                        className="absolute -bottom-0.5 left-2.5 right-2.5 h-px bg-accent"
                         transition={{ type: "spring", stiffness: 400, damping: 32 }}
                       />
                     )}
                   </Link>
                 );
               })}
-            </nav>
-
-            {/* live local time — small editorial signal of availability */}
-            <span className="hidden items-center gap-2 border-l border-line pl-5 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-faint md:flex">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent shadow-[0_0_8px_rgba(193,18,31,0.8)]" />
-              Bengaluru {time}
-            </span>
-
-            <ThemeToggle />
-
-            <Magnetic className="inline-block">
-              <Link
-                href="/#contact"
-                className="inline-flex items-center gap-2 rounded-full border border-line-strong px-3 py-2 font-mono text-[0.7rem] uppercase tracking-[0.16em] text-bone transition-colors duration-300 hover:border-accent hover:bg-accent hover:text-[#160a02] sm:px-4"
+              <a
+                href="#contact"
+                onClick={(e) => {
+                  const lenis = getLenis();
+                  if (lenis) {
+                    e.preventDefault();
+                    lenis.scrollTo("#contact");
+                  }
+                }}
+                className="px-2.5 py-1 font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-ink sm:px-3"
               >
                 Contact
-              </Link>
-            </Magnetic>
+              </a>
+            </nav>
+
+            <ThemeToggle className="ml-2" />
           </div>
         </div>
       </div>

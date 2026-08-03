@@ -1,168 +1,110 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import gsap from "gsap";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import dynamic from "next/dynamic";
 import Magnetic from "@/components/Magnetic";
-import { heroScroll } from "@/lib/heroScroll";
-import { useTheme } from "@/components/theme/ThemeProvider";
+import { onIntroDone } from "@/lib/intro";
 
-const LivingPortrait = dynamic(() => import("@/components/three/LivingPortrait"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-full w-full items-center justify-center">
-      <div className="relative h-24 w-24">
-        <span className="absolute inset-0 rounded-full border border-accent/40 animate-pulse-ring" />
-        <span className="absolute inset-0 rounded-full border border-accent/20" />
-      </div>
-    </div>
-  ),
-});
+const ContourField = dynamic(() => import("@/components/three/ContourField"), { ssr: false });
 
+/**
+ * Hero: full-width display statement laid OVER the contour field, which owns
+ * the right edge. Entrances are gated on the preloader handoff, not scroll.
+ * The headline's width axis relaxes as you scroll away (var --p, lerped).
+ */
 export default function Hero() {
-  const { horror } = useTheme();
-  const root = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: root,
-    offset: ["start start", "end start"],
-  });
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, -90]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
-  const stageScale = useTransform(scrollYProgress, [0, 1], [1, 1.18]);
-  const stageY = useTransform(scrollYProgress, [0, 1], [0, 70]);
+  const section = useRef<HTMLElement>(null);
+  const [done, setDone] = useState(false);
 
-  // Feed hero scroll into the 3D scene (camera dolly + spin-up).
-  useEffect(() => scrollYProgress.on("change", (v) => (heroScroll.p = v)), [scrollYProgress]);
+  useEffect(() => onIntroDone(() => setDone(true)), []);
 
+  // Lerped scroll progress channel (playbook 2.8): one number, CSS does the rest.
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.set(".hero-word", { yPercent: 118 });
-      gsap.set([".hero-eyebrow", ".hero-sub", ".hero-cta", ".hero-foot"], {
-        opacity: 0,
-        y: 18,
-      });
+    const el = section.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-      const tl = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.15 });
-      tl.to(".hero-eyebrow", { opacity: 1, y: 0, duration: 0.8, stagger: 0.12 })
-        .to(".hero-word", { yPercent: 0, duration: 1.2, stagger: 0.075 }, "-=0.45")
-        .to(".hero-sub", { opacity: 1, y: 0, duration: 0.9 }, "-=0.8")
-        .to(".hero-cta", { opacity: 1, y: 0, duration: 0.8 }, "-=0.6")
-        .to(".hero-foot", { opacity: 1, y: 0, duration: 0.8 }, "-=0.6");
-    }, root);
+    let raf = 0;
+    let sp = 0;
+    let active = true;
+    const io = new IntersectionObserver(([e]) => {
+      active = e.isIntersecting;
+    });
+    io.observe(el);
 
-    return () => ctx.revert();
+    const tick = () => {
+      if (active) {
+        const r = el.getBoundingClientRect();
+        const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - window.innerHeight / 2)));
+        sp += (p - sp) * 0.12;
+        el.style.setProperty("--p", sp.toFixed(4));
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+    };
   }, []);
 
   return (
     <section
-      ref={root}
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden px-5 pb-16 pt-28 sm:px-8"
+      ref={section}
+      data-io={done ? "in" : "out"}
+      className="relative flex min-h-[100dvh] flex-col justify-end overflow-clip px-5 pb-16 pt-28 sm:px-10"
+      style={{ "--p": 0 } as React.CSSProperties}
     >
-      {/* warm halo so the chrome core sits on a pool of light, not flat void */}
-      <div className="pointer-events-none absolute inset-0 lg:left-[40%]">
-        <div
-          className="absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+      {/* the field owns the right half on desktop, whispers behind on mobile */}
+      <ContourField className="absolute inset-y-0 right-0 w-full opacity-40 lg:w-[46%] lg:border-l lg:border-line lg:opacity-100" />
+
+      <div className="relative z-10 mx-auto w-full max-w-[1440px]">
+        <h1
+          className="display-xl text-ink"
           style={{
-            background:
-              "radial-gradient(circle, rgba(193,18,31,0.22) 0%, rgba(60,10,14,0.10) 40%, transparent 70%)",
-            filter: "blur(40px)",
+            fontStretch: "calc(125% - var(--p) * 20%)",
+            // sized so the longest line stays a single slot on desktop
+            fontSize: "clamp(2.6rem, 7.2vw, 6.6rem)",
           }}
-        />
-      </div>
-
-      {/* 3D stage — on mobile it fills the upper canvas so the face haunts the
-          headline; on desktop it sits on the right half clear of the text */}
-      <motion.div
-        style={{ scale: stageScale, y: stageY }}
-        className="absolute inset-x-0 top-0 bottom-[30%] lg:inset-0 lg:bottom-0 lg:left-[40%]"
-      >
-        <LivingPortrait horror={horror} />
-      </motion.div>
-
-      {/* legibility scrim — lighter on mobile so the face reads through */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-void via-void/45 to-transparent lg:via-void/30" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-void via-void/80 to-transparent lg:h-40 lg:via-transparent" />
-
-      <motion.div style={{ y: contentY, opacity: contentOpacity }} className="relative z-10 mx-auto w-full max-w-[1400px]">
-        <div className="hero-eyebrow mb-6 inline-flex items-center gap-2.5 rounded-full border border-line-strong bg-surface/40 py-1.5 pl-3 pr-4 backdrop-blur-sm">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+        >
+          <span className="rv-slot block">
+            <span className="rv-rise block">Systems that</span>
           </span>
-          <span className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-bone/85">
-            Available for work — 2026
-          </span>
-        </div>
-
-        <p className="hero-eyebrow eyebrow mb-6 flex items-center gap-3">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-          Full-stack · Systems · AI — India
-        </p>
-
-        <h1 className="font-display max-w-[15ch] text-[clamp(2.9rem,6.4vw,6.2rem)] leading-[0.96] tracking-[-0.02em]">
-          <span className="flex flex-wrap overflow-hidden py-[0.06em]">
-            <span className="hero-word inline-block">Engineering</span>
-            <span className="hero-word ml-[0.25em] inline-block">the</span>
-          </span>
-          <span className="flex flex-wrap items-baseline overflow-hidden py-[0.06em]">
-            <span
-              className="hero-word inline-block italic accent-text horror-glitch"
-              style={{ textShadow: "0 0 44px rgba(193,18,31,0.6), 0 0 12px rgba(193,18,31,0.5)" }}
-            >
-              invisible
+          <span className="rv-slot block">
+            <span className="rv-rise block" style={{ "--rv-d": "0.12s" } as React.CSSProperties}>
+              decide<span className="text-accent">,</span>
             </span>
-            <span className="hero-word ml-[0.25em] inline-block">systems</span>
           </span>
-          <span className="flex flex-wrap overflow-hidden py-[0.06em]">
-            <span className="hero-word inline-block">behind</span>
-            <span className="hero-word ml-[0.25em] inline-block">the</span>
-            <span className="hero-word ml-[0.25em] inline-block">screen.</span>
+          <span className="rv-slot block">
+            <span className="rv-rise block" style={{ "--rv-d": "0.24s" } as React.CSSProperties}>
+              products that ship<span className="text-accent">.</span>
+            </span>
           </span>
         </h1>
 
-        <p className="hero-sub mt-8 max-w-md text-lg leading-relaxed text-muted">
-          I&apos;m Ridham Goyal — I build real-time backends, AI decision
-          engines, and full-stack products engineered for throughput,
-          reliability, and scale.
-        </p>
-
-        <div className="hero-cta mt-10 flex flex-wrap items-center gap-4">
-          <Magnetic className="inline-block">
-            <Link
-              href="/projects"
-              className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-full bg-bone px-6 py-3.5 font-mono text-xs uppercase tracking-[0.16em] text-void transition-transform duration-300 hover:scale-[1.03]"
-            >
-              <span className="relative z-10">Explore the work</span>
-              <ArrowUpRight
-                size={15}
-                className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-              {/* light glints across on hover */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 -left-1/3 z-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/70 to-transparent opacity-0 transition-all duration-700 ease-out group-hover:left-[110%] group-hover:opacity-100"
-              />
-            </Link>
-          </Magnetic>
-          <Link
-            href="/#contact"
-            className="link-underline font-mono text-xs uppercase tracking-[0.16em] text-muted transition-colors hover:text-bone"
+        <div className="mt-10 flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+          <p
+            className="rv-fade max-w-md text-lg leading-relaxed text-muted"
+            style={{ "--rv-d": "0.45s" } as React.CSSProperties}
           >
-            Get in touch
-          </Link>
-        </div>
+            Full-stack engineer in Bengaluru. Real-time backends, AI decision
+            engines, and shipped products with real users.
+          </p>
 
-        <div className="hero-foot mt-20 flex max-w-[1400px] items-center justify-between font-mono text-[0.7rem] uppercase tracking-[0.18em] text-faint">
-          <span className="flex items-center gap-2">
-            <ArrowDown size={13} className="animate-bounce text-accent" />
-            Scroll to explore
-          </span>
-          <span className="hidden sm:block">17 shipped · 11 live</span>
+          <div className="rv-fade" style={{ "--rv-d": "0.55s" } as React.CSSProperties}>
+            <Magnetic className="inline-block">
+              <Link
+                href="/projects"
+                className="group inline-flex items-center gap-3 rounded-full border border-line-strong px-6 py-4 font-mono text-xs uppercase tracking-[0.18em] text-ink transition-colors duration-300 hover:border-accent hover:bg-accent hover:text-accent-ink"
+              >
+                See the work
+                <span className="inline-block h-2 w-2 bg-accent transition-colors duration-300 group-hover:bg-accent-ink" />
+              </Link>
+            </Magnetic>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

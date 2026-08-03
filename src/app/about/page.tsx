@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Reveal from "@/components/Reveal";
 import Counter from "@/components/Counter";
-import { SkullWatermark } from "@/components/horror/HorrorMotifs";
+import Io from "@/components/system/Io";
 
 export const metadata: Metadata = {
   title: "About — Ridham Goyal",
@@ -13,15 +12,15 @@ export const metadata: Metadata = {
 const principles = [
   {
     title: "The backend is the product",
-    body: "The polish people feel — instant, reliable, never-loses-your-data — is usually a backend decision. I design the data layer and the failure modes first.",
+    body: "The polish people feel, the instant, reliable, never-loses-your-data kind, is usually a backend decision. I design the data layer and the failure modes first.",
   },
   {
     title: "Ship it, then prove it",
-    body: "A project isn't done until it's deployed and someone can click it. Eight of mine are live right now, not screenshots in a README.",
+    body: "A project isn't done until it's deployed and someone can click it. Eleven of mine are live right now, not screenshots in a README.",
   },
   {
     title: "Decisions, not just CRUD",
-    body: "The work I care about most is systems that decide — game-theory agents, ML forecasts, LLM features wired into real flows.",
+    body: "The work I care about most is systems that decide. Game-theory agents, ML forecasts, LLM features wired into real flows.",
   },
   {
     title: "Boring where it counts",
@@ -29,104 +28,122 @@ const principles = [
   },
 ];
 
+const stats: [string, string][] = [
+  ["17", "Projects shipped"],
+  ["11", "Live deployments"],
+  ["TS / PY", "Primary stacks"],
+  ["2026", "Open to work"],
+];
+
 export default function AboutPage() {
   return (
-    <main className="relative z-10 mx-auto max-w-[1400px] px-5 pb-32 pt-36 sm:px-8">
-      <Reveal>
-        <p className="eyebrow mb-6">[ About ]</p>
-        <h1 className="display-lg max-w-4xl text-balance">
-          I&apos;m Ridham — I gravitate to the{" "}
-          <span className="font-display italic accent-text dread-glow">hard parts</span> of
-          software.
+    <main className="relative z-10 mx-auto max-w-[1440px] px-5 pb-32 pt-36 sm:px-10">
+      <Io as="header">
+        <h1 className="display-xl">
+          <span className="rv-mask block">I gravitate to</span>
+          <span className="rv-mask block" style={{ "--rv-d": "0.12s" } as React.CSSProperties}>
+            the <span className="text-accent">hard parts</span>.
+          </span>
         </h1>
-      </Reveal>
+      </Io>
 
-      <div className="mt-20 grid gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="mt-20 grid gap-14 lg:grid-cols-[0.85fr_1.15fr]">
         {/* photo */}
-        <Reveal>
-          <div className="group relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-3xl border border-line lg:sticky lg:top-28 lg:mx-0">
-            <Image
-              src="/profile-photo.jpg"
-              alt="Ridham Goyal"
-              fill
-              sizes="(max-width: 1024px) 100vw, 480px"
-              className="object-cover object-[68%_center] grayscale transition-all duration-700 group-hover:grayscale-0"
-              priority
-            />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-accent/25 via-transparent to-cool/15 mix-blend-soft-light" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void/70 via-transparent to-transparent" />
-            <div className="absolute bottom-5 left-5 font-mono text-[0.65rem] uppercase tracking-[0.18em] text-bone">
-              Ridham Goyal — Bengaluru, IN
+        <Io>
+          <div className="mx-auto w-full max-w-sm lg:sticky lg:top-28 lg:mx-0">
+            <div className="grayscale transition duration-700 hover:grayscale-0">
+              <div className="rv-curtain relative aspect-[3/4] overflow-hidden rounded-none border border-line">
+                <Image
+                  src="/profile-photo.jpg"
+                  alt="Ridham Goyal"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 480px"
+                  className="object-cover object-[68%_center]"
+                  priority
+                />
+              </div>
             </div>
+            <p className="mt-3 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted">
+              Ridham Goyal / Bengaluru, IN
+            </p>
           </div>
-        </Reveal>
+        </Io>
 
         {/* bio */}
-        <Reveal delay={0.1}>
-          <div className="space-y-6 text-lg leading-relaxed text-muted">
-            <p>
-              I&apos;m a full-stack developer who spends most of my time where the
-              hard problems live — real-time backends, event-driven
+        <div>
+          <Io className="space-y-6 text-lg leading-relaxed text-muted">
+            <p className="rv-fade">
+              I&apos;m a full-stack developer who spends most of my time where
+              the hard problems live. Real-time backends, event-driven
               architectures, and the AI systems that have to actually make a
               call. I like building the parts of an app that users never see but
               always feel.
             </p>
-            <p>
-              That&apos;s meant building and shipping <span className="text-bone">EnamDoc</span>{" "}
-              — a dental platform now in production with real users — solo, end
-              to end, SEO and all. And before it: a real-time messaging engine on
-              Socket.io, a NestJS transaction backend with queues and ACID
-              guarantees, a poker agent that uses counterfactual regret
-              minimization, and an ML platform that forecasts renewable energy
-              from live weather. The throughline is the same: design the data and
-              the failure modes first, then build up.
+            <p className="rv-fade" style={{ "--rv-d": "0.12s" } as React.CSSProperties}>
+              That&apos;s meant building and shipping{" "}
+              <span className="text-ink">EnamDoc</span>, a dental platform now
+              in production with real users. Built solo, end to end, SEO and
+              all. And before it: a real-time messaging engine on Socket.io, a
+              NestJS transaction backend with queues and ACID guarantees, a
+              poker agent that uses counterfactual regret minimization, and an
+              ML platform that forecasts renewable energy from live weather. The
+              throughline is the same: design the data and the failure modes
+              first, then build up.
             </p>
-            <p>
-              I work mostly in the TypeScript and Python ecosystems — Next.js,
+            <p className="rv-fade" style={{ "--rv-d": "0.24s" } as React.CSSProperties}>
+              I work mostly in the TypeScript and Python ecosystems. Next.js,
               NestJS, React on top; Postgres, Redis, RabbitMQ, Prisma, and
-              Docker underneath. When something needs to think, that&apos;s where
-              TensorFlow, Gemini, and a bit of game theory come in.
+              Docker underneath. When something needs to think, that&apos;s
+              where TensorFlow, Gemini, and a bit of game theory come in.
             </p>
+          </Io>
 
-            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line">
-              {[
-                ["17", "Projects shipped"],
-                ["11", "Live deployments"],
-                ["TS / PY", "Primary stacks"],
-                ["2026", "Open to work"],
-              ].map(([v, l]) => (
-                <div key={l} className="bg-void p-6">
-                  <Counter value={v} className="font-display text-3xl text-bone" />
-                  <div className="mt-1 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted">
-                    {l}
-                  </div>
+          <Io className="mt-14 grid grid-cols-2">
+            {stats.map(([value, label], i) => (
+              <div
+                key={label}
+                className={`rv-fade border-t border-line py-6 ${i % 2 === 1 ? "border-l pl-6" : "pr-6"}`}
+                style={{ "--rv-d": `${i * 0.08}s` } as React.CSSProperties}
+              >
+                <Counter value={value} className="display-md text-3xl text-ink" />
+                <div className="mt-1 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted">
+                  {label}
                 </div>
-              ))}
-            </div>
-          </div>
-        </Reveal>
+              </div>
+            ))}
+          </Io>
+        </div>
       </div>
 
       {/* principles */}
-      <section className="relative mt-32">
-        <SkullWatermark size={560} className="!top-[60%]" />
-        <Reveal>
-          <p className="eyebrow mb-5">[ How I work ]</p>
-          <h2 className="display-lg max-w-3xl text-balance">
-            Four things I keep coming <span className="font-display italic accent-text dread-glow">back to</span>.
+      <section className="mt-32">
+        <Io>
+          <h2 className="display-lg rv-mask max-w-3xl text-balance">
+            Four things I keep coming back to<span className="text-accent">.</span>
           </h2>
-        </Reveal>
+        </Io>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2">
-          {principles.map((p, i) => (
-            <Reveal key={p.title} delay={(i % 2) * 0.08} className="bg-void">
-              <div className="flex h-full flex-col gap-4 bg-surface/30 p-8 transition-colors duration-500 hover:bg-surface/70 lg:p-10">
-                <span className="font-mono text-xs text-faint">0{i + 1}</span>
-                <h3 className="font-display text-2xl text-bone sm:text-3xl">{p.title}</h3>
-                <p className="leading-relaxed text-muted">{p.body}</p>
+        <div className="mt-14">
+          {principles.map((p) => (
+            <Io key={p.title} className="relative py-10">
+              <span className="rv-rule absolute inset-x-0 top-0 block h-px bg-line-strong" />
+              <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr] lg:gap-12">
+                <h3
+                  className="display-md rv-mask text-2xl text-ink sm:text-3xl"
+                  style={{ "--rv-d": "0.1s" } as React.CSSProperties}
+                >
+                  {p.title}
+                </h3>
+                <p
+                  className="rv-fade max-w-xl leading-relaxed text-muted"
+                  style={{ "--rv-d": "0.2s" } as React.CSSProperties}
+                >
+                  {p.body}
+                </p>
               </div>
-            </Reveal>
+            </Io>
           ))}
+          <div className="hairline" />
         </div>
       </section>
     </main>

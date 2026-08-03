@@ -1,91 +1,66 @@
-"use client";
+import Io from "@/components/system/Io";
 
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Reveal from "@/components/Reveal";
-import RevealHeading from "@/components/RevealHeading";
-import Scramble from "@/components/horror/Scramble";
-import { SkullWatermark } from "@/components/horror/HorrorMotifs";
-import { Server, Radio, BrainCircuit } from "lucide-react";
-
+/** Three layers of the stack as ledger rows: rule draws, title rises, body fades. */
 const pillars = [
   {
-    Icon: Server,
     title: "Backend & systems",
-    body: "APIs that hold up under load — ACID-safe transactions, message queues, caching layers, and schemas indexed for the queries that actually run.",
+    body: "APIs that hold up under load. ACID-safe transactions, message queues, caching layers, and schemas indexed for the queries that actually run.",
     tags: ["NestJS", "RabbitMQ", "Redis", "Prisma"],
   },
   {
-    Icon: Radio,
     title: "Real-time",
-    body: "Live experiences built on Socket.io — presence, typing, media streams, and reconnection logic that keeps state in sync when the network doesn't cooperate.",
+    body: "Live experiences built on Socket.io. Presence, typing, media streams, and reconnection logic that keeps state in sync when the network doesn't cooperate.",
     tags: ["Socket.io", "WebSockets", "Event-driven"],
   },
   {
-    Icon: BrainCircuit,
     title: "AI & decision engines",
-    body: "Systems that decide — CFR game-theory agents, ML forecasting pipelines, and LLM features wired into real product flows, not demos.",
+    body: "Systems that decide. CFR game-theory agents, ML forecasting pipelines, and LLM features wired into real product flows, not demos.",
     tags: ["CFR", "TensorFlow", "Gemini", "FastAPI"],
   },
 ];
 
 export default function Capabilities() {
-  const grid = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => {
-      gsap.from(".cap-card", {
-        y: 64,
-        opacity: 0,
-        duration: 0.9,
-        ease: "power3.out",
-        stagger: 0.12,
-        scrollTrigger: { trigger: grid.current, start: "top 82%" },
-      });
-    }, grid);
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section className="relative mx-auto max-w-[1400px] overflow-hidden px-5 py-28 sm:px-8">
-      <SkullWatermark size={560} className="opacity-70" />
-      <Reveal>
-        <Scramble as="p" text="[ What I do ]" className="eyebrow mb-5 block" />
-      </Reveal>
-      <RevealHeading className="display-lg max-w-3xl text-balance" delay={0.05}>
-        Three layers of the stack, <span className="font-display italic accent-text dread-glow">engineered</span> end to end.
-      </RevealHeading>
+    <section className="mx-auto max-w-[1440px] px-5 py-28 sm:px-10">
+      <Io>
+        <h2 className="display-lg rv-mask max-w-3xl text-balance">
+          What I build<span className="text-accent">.</span>
+        </h2>
+      </Io>
 
-      <div
-        ref={grid}
-        className="mt-16 grid gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-3"
-      >
+      <div className="mt-14">
         {pillars.map((p, i) => (
-          <div
-            key={p.title}
-            className="cap-card card-bleed group relative flex h-full flex-col gap-5 bg-surface/30 p-8 transition-colors duration-500 hover:bg-surface/70 lg:p-10"
-          >
-            <div className="flex items-center justify-between">
-              <p.Icon className="h-6 w-6 text-accent" strokeWidth={1.5} />
-              <span className="font-mono text-xs text-faint">0{i + 1}</span>
-            </div>
-            <h3 className="font-display text-3xl text-bone">{p.title}</h3>
-            <p className="text-[0.95rem] leading-relaxed text-muted">{p.body}</p>
-            <div className="mt-auto flex flex-wrap gap-2 pt-4">
-              {p.tags.map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full border border-line px-3 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-muted"
+          <Io key={p.title} className="relative py-10">
+            <span className="rv-rule absolute inset-x-0 top-0 block h-px bg-line-strong" />
+            <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr] lg:gap-12">
+              <h3
+                className="display-md rv-mask text-2xl text-ink sm:text-3xl"
+                style={{ "--rv-d": "0.1s" } as React.CSSProperties}
+              >
+                {p.title}
+              </h3>
+              <div>
+                <p
+                  className="rv-fade max-w-xl leading-relaxed text-muted"
+                  style={{ "--rv-d": "0.2s" } as React.CSSProperties}
                 >
-                  {t}
-                </span>
-              ))}
+                  {p.body}
+                </p>
+                <div
+                  className="rv-fade mt-5 flex flex-wrap gap-x-5 gap-y-2"
+                  style={{ "--rv-d": `${0.28 + i * 0.02}s` } as React.CSSProperties}
+                >
+                  {p.tags.map((t) => (
+                    <span key={t} className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-faint">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          </Io>
         ))}
+        <div className="hairline" />
       </div>
     </section>
   );

@@ -1,27 +1,23 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Archivo, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Cursor from "@/components/Cursor";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import Background from "@/components/Background";
 import ScrollProgress from "@/components/ScrollProgress";
+import Preloader from "@/components/system/Preloader";
 import { ThemeProvider, themeNoFlashScript } from "@/components/theme/ThemeProvider";
-import HorrorLayer from "@/components/horror/HorrorLayer";
 
-const instrument = Instrument_Serif({
-  weight: "400",
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-instrument",
-  display: "swap",
-});
+// Repeat visitors and reduced-motion users never see the intro sheet, even
+// before hydration (the sheet is server-rendered so first visits paint it).
+const introNoFlashScript = `(function(){try{if(sessionStorage.getItem('ledger-intro-seen')==='1'||window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('intro-seen');}}catch(e){}})();`;
 
-const hanken = Hanken_Grotesk({
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-hanken",
+  variable: "--font-archivo",
   display: "swap",
+  axes: ["wdth"],
 });
 
 const jetbrains = JetBrains_Mono({
@@ -66,14 +62,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="normal"
-      className={`${instrument.variable} ${hanken.variable} ${jetbrains.variable}`}
+      data-theme="light"
+      suppressHydrationWarning
+      className={`${archivo.variable} ${jetbrains.variable}`}
     >
-      <body className="bg-void text-bone antialiased">
+      <body className="bg-bg text-ink antialiased">
         <script dangerouslySetInnerHTML={{ __html: themeNoFlashScript }} />
+        <script dangerouslySetInnerHTML={{ __html: introNoFlashScript }} />
+        {/* Content must survive without JS: undo the reveal system's hidden states */}
+        <noscript>
+          <style>{`.rv-mask,.rv-rise,.rv-fade,.rv-rule,.rv-curtain,.rv-tick{clip-path:none!important;transform:none!important;opacity:1!important}.intro-sheet{display:none!important}`}</style>
+        </noscript>
         <ThemeProvider>
-          <Background />
-          <HorrorLayer />
+          <Preloader />
           <Cursor />
           <ScrollProgress />
           <Nav />
