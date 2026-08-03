@@ -99,7 +99,7 @@ export default function WorkRail() {
   return (
     <section ref={wrap} className="group relative overflow-clip border-t border-line">
       <Io className="flex items-end justify-between px-5 pb-8 pt-20 sm:px-10 group-data-[pinned]:absolute group-data-[pinned]:inset-x-0 group-data-[pinned]:top-0 group-data-[pinned]:z-10">
-        <h2 className="display-lg rv-mask">Selected work</h2>
+        <h2 className="display-lg rv-mask type-breathe">Selected work</h2>
         <Link
           href="/projects"
           className="rv-fade link-underline hidden font-mono text-xs uppercase tracking-[0.18em] text-muted hover:text-ink sm:block"
@@ -118,6 +118,7 @@ export default function WorkRail() {
           <Link
             key={p.slug}
             href={`/projects/${p.slug}`}
+            data-hv
             className="rail-card group/card relative w-[78vw] max-w-[560px] shrink-0 snap-start sm:w-[52vw] group-data-[pinned]:w-[38vw]"
             style={{ "--cp": 0 } as React.CSSProperties}
           >
@@ -143,7 +144,7 @@ export default function WorkRail() {
             </div>
 
             <div className="mt-4 flex items-baseline justify-between gap-4">
-              <span className="display-md text-ink transition-colors duration-300 group-hover/card:text-accent">
+              <span className="display-md hv-cast text-ink group-hover/card:text-accent group-focus-within/card:text-accent">
                 {p.title}
               </span>
               <span className="flex shrink-0 items-center gap-2 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted">
@@ -162,9 +163,10 @@ export default function WorkRail() {
 
         <Link
           href="/projects"
+          data-hv
           className="group/card flex w-[60vw] max-w-[420px] shrink-0 snap-start items-center justify-center border border-line bg-surface group-data-[pinned]:w-[24vw]"
         >
-          <span className="display-md flex items-center gap-3 text-ink transition-colors duration-300 group-hover/card:text-accent">
+          <span className="display-md hv-cast flex items-center gap-3 text-ink group-hover/card:text-accent group-focus-within/card:text-accent">
             All 17 projects
             <ArrowUpRight size={22} />
           </span>

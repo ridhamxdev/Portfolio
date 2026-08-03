@@ -13,6 +13,9 @@ import { ThemeProvider, themeNoFlashScript } from "@/components/theme/ThemeProvi
 // before hydration (the sheet is server-rendered so first visits paint it).
 const introNoFlashScript = `(function(){try{if(sessionStorage.getItem('ledger-intro-seen')==='1'||window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('intro-seen');}}catch(e){}})();`;
 
+// Keep `weight` UNPINNED: for a variable font next/font then ships the full
+// wght 100-900 range, which the CAST type kinetics animate. Only `wdth` is a
+// definable axis here — adding "wght" to axes throws at build time.
 const archivo = Archivo({
   subsets: ["latin"],
   variable: "--font-archivo",
@@ -71,7 +74,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: introNoFlashScript }} />
         {/* Content must survive without JS: undo the reveal system's hidden states */}
         <noscript>
-          <style>{`.rv-mask,.rv-rise,.rv-fade,.rv-rule,.rv-curtain,.rv-tick{clip-path:none!important;transform:none!important;opacity:1!important}.intro-sheet{display:none!important}`}</style>
+          <style>{`.rv-mask,.rv-rise,.rv-fade,.rv-rule,.rv-curtain,.rv-tick{clip-path:none!important;transform:none!important;opacity:1!important}.rv-cast{--fv-wght-cast:0!important;--fv-wdth-cast:0!important}.intro-sheet{display:none!important}`}</style>
         </noscript>
         <ThemeProvider>
           <Preloader />

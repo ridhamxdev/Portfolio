@@ -116,13 +116,14 @@ export default function ProjectsIndex() {
                     setPreview(null);
                   }
                 }}
+                data-hv
                 className="rv-fade group grid grid-cols-[2.5rem_1fr_1.5rem] items-baseline gap-x-4 border-t border-line px-1 py-6 hover:bg-surface sm:grid-cols-[3.5rem_1fr_auto_1.75rem] sm:gap-x-6 sm:px-2"
                 style={{ "--rv-d": `${(i % 5) * 0.06}s` } as React.CSSProperties}
               >
                 <span className="font-mono text-[0.7rem] text-faint">{num}</span>
 
                 <span className="min-w-0">
-                  <span className="display-md block text-ink transition-colors duration-300 group-hover:text-accent">
+                  <span className="display-md hv-cast block text-ink group-hover:text-accent group-focus-within:text-accent">
                     {p.title}
                   </span>
                   <span className="mt-1 block font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted sm:hidden">

@@ -54,6 +54,26 @@
   --ease-micro: cubic-bezier(0.215, 0.61, 0.355, 1);   /* .1-.3s micro moves */
 }
 
+/* ---------------------------------------------------------------------------
+   VARIABLE-FONT KINETICS — "CAST & RESPOND"
+   Archivo carries wght 100-900 AND wdth 62-125 continuously (weight is left
+   unpinned in layout.tsx, so next/font ships the full range). Display type is
+   driven by additive delta channels summed inside one calc per axis, so no two
+   behaviours ever fight over the same value:
+     wght = BASE + cast + breathe + prox + hover
+     wdth = BASE + cast + scroll + hover
+   Only channels that must interpolate through a transition or keyframe are
+   registered here (unregistered <number> vars would step, not tween). The
+   JS-lerped channels (--wdth-scroll, --wght-prox, --prox) stay UNREGISTERED on
+   purpose: a registered var caught in interpolation would smear behind the
+   already-lerped value. JS writes ONE number per channel; CSS does the math.
+   --------------------------------------------------------------------------- */
+@property --fv-wght-cast { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --fv-wdth-cast { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --wght-hover   { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --wdth-hover   { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --wght-breathe { syntax: "<number>"; inherits: true; initial-value: 0; }
+
 [data-theme="dark"] {
   --bg: #07080c;
   --surface: #0d0f16;
@@ -119,11 +139,16 @@
 @layer components {
   /* ---- Type voices ---- */
 
-  /* Display: Archivo pushed wide and heavy. font-stretch rides the wdth axis. */
+  /* Display: Archivo pushed wide and heavy. The font-weight / font-stretch
+     lines are the static fallback (no @property / no font-variation-settings);
+     where supported, the additive kinetics calc wins. */
   .display-xl {
     font-family: var(--font-display);
     font-weight: 800;
     font-stretch: 125%;
+    font-variation-settings:
+      "wght" calc(800 + var(--fv-wght-cast, 0) + var(--wght-breathe, 0) + var(--wght-prox, 0) + var(--wght-hover, 0)),
+      "wdth" calc(125 + var(--fv-wdth-cast, 0) + var(--wdth-scroll, 0) + var(--wdth-hover, 0));
     text-transform: uppercase;
     font-size: clamp(2.9rem, 9.5vw, 8.75rem);
     line-height: 0.92;
@@ -134,6 +159,9 @@
     font-family: var(--font-display);
     font-weight: 800;
     font-stretch: 122%;
+    font-variation-settings:
+      "wght" calc(800 + var(--fv-wght-cast, 0) + var(--wght-breathe, 0) + var(--wght-prox, 0) + var(--wght-hover, 0)),
+      "wdth" calc(122 + var(--fv-wdth-cast, 0) + var(--wdth-scroll, 0) + var(--wdth-hover, 0));
     text-transform: uppercase;
     font-size: clamp(2rem, 5.4vw, 4.6rem);
     line-height: 0.95;
@@ -144,6 +172,9 @@
     font-family: var(--font-display);
     font-weight: 750;
     font-stretch: 118%;
+    font-variation-settings:
+      "wght" calc(750 + var(--fv-wght-cast, 0) + var(--wght-breathe, 0) + var(--wght-prox, 0) + var(--wght-hover, 0)),
+      "wdth" calc(118 + var(--fv-wdth-cast, 0) + var(--wdth-scroll, 0) + var(--wdth-hover, 0));
     font-size: clamp(1.35rem, 2.6vw, 2.1rem);
     line-height: 1.04;
     letter-spacing: -0.005em;
@@ -291,6 +322,82 @@
     transform: scale(1);
   }
 
+  /* ===================================================================
+     TYPE KINETICS — the display face is a living material.
+     Declared AFTER the rv-* reveal classes so .rv-cast's transition is a
+     superset (it also carries clip-path + color) and wins cleanly when a
+     heading pairs rv-cast with rv-mask, instead of clobbering it.
+     =================================================================== */
+
+  /* CAST: the headline arrives thin + condensed and gains mass as it seats.
+     Width spreads on the structural curve; weight HOLDS then SNAPS (1,0,0,1)
+     exactly as the word lands. Pair with rv-mask (block headings) or with
+     rv-slot/rv-rise (the hero). Deltas are fixed and never underflow the axis
+     (xl 800-480=320, wdth 125-46=79; md 750-480=270, 118-46=72). */
+  .rv-cast {
+    --fv-wght-cast: -480;
+    --fv-wdth-cast: -46;
+    transition:
+      clip-path 1s var(--ease-struct) var(--rv-d, 0s),
+      --fv-wght-cast 1.15s var(--ease-snap) var(--rv-d, 0s),
+      --fv-wdth-cast 1.1s var(--ease-struct) var(--rv-d, 0s),
+      color 0.3s var(--ease-micro);
+  }
+  [data-io="in"] .rv-cast,
+  [data-io="in"].rv-cast {
+    --fv-wght-cast: 0;
+    --fv-wdth-cast: 0;
+  }
+
+  /* WIDTH RELAX: a tagged heading loses width as its section scrolls past.
+     The section lerps one number (--p, 0..1); CSS turns it into a wdth delta.
+     Generalized from the hero's original inline hack. */
+  .wx-relax {
+    --wdth-scroll: calc(clamp(0, var(--p, 0), 1) * var(--wx-range, -18));
+  }
+
+  /* HOVER PRESS: interactive display titles thicken under the cursor. Snap in
+     (mechanical thunk), luxe settle out — mirrors the rv-tick signature. Put
+     hv-cast on the title span and data-hv on the wrapping link so pointer and
+     keyboard both fire it. Carries the color transition too, so titles keep
+     their accent hover without a separate transition-* utility. */
+  .hv-cast {
+    transition:
+      --wght-hover 0.55s var(--ease-luxe),
+      --wdth-hover 0.55s var(--ease-luxe),
+      color 0.3s var(--ease-micro);
+  }
+  .hv-cast:hover,
+  .hv-cast:focus-visible,
+  [data-hv]:hover .hv-cast,
+  [data-hv]:focus-within .hv-cast {
+    --wght-hover: var(--hv-gain, 80);
+    --wdth-hover: 0;
+    transition:
+      --wght-hover 0.26s var(--ease-snap),
+      --wdth-hover 0.26s var(--ease-snap),
+      color 0.3s var(--ease-micro);
+  }
+
+  /* PROXIMITY (--wght-prox): the hero headline gains mass as the cursor nears.
+     Hero.tsx lerps ONE number onto the section (fine pointers only, bails under
+     reduced motion) and the display calc adds it. No CSS channel to declare,
+     and it stays unregistered on purpose so the already-lerped value never
+     smears behind a second interpolation. Cursor-driven, never idle. */
+
+  /* IDLE BREATHE (--wght-breathe): a display heading breathes weight while it
+     sits in view. Opt-in via .type-breathe; play-state is gated on data-io so
+     it never burns frames off-screen (playbook: pause off-screen). Kept OFF the
+     hero deliberately, an always-breathing hero statement is too much. */
+  .type-breathe {
+    animation: type-breathe 7s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-play-state: paused;
+  }
+  [data-io="in"] .type-breathe,
+  [data-io="in"].type-breathe {
+    animation-play-state: running;
+  }
+
   .breathe {
     animation: breathe 3.35s infinite;
   }
@@ -314,6 +421,13 @@
   0% { transform: scale(0.968); animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19); }
   80% { transform: scale(1.03); animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
   85%, 100% { transform: scale(0.968); }
+}
+
+/* Idle weight breath for a display heading in view — subtle, symmetric.
+   Peaks at +42 wght: display-lg 800->842, display-md 750->792 (both < 900). */
+@keyframes type-breathe {
+  0%, 100% { --wght-breathe: 0; }
+  50% { --wght-breathe: 42; }
 }
 
 @keyframes caret {
@@ -365,6 +479,10 @@ html.intro-seen .intro-sheet {
     transition-duration: 0.001ms !important;
     transition-delay: 0s !important;
   }
+  /* Type kinetics bail straight to their settled state. */
+  .rv-cast { --fv-wght-cast: 0; --fv-wdth-cast: 0; }
+  .wx-relax { --wdth-scroll: 0; }
+  .type-breathe { animation: none !important; --wght-breathe: 0; }
 }
 
 /* =====================================================================
@@ -408,8 +526,23 @@ html.intro-seen .intro-sheet {
     transition: none !important;
   }
   .breathe,
-  .caret {
+  .caret,
+  .type-breathe {
     animation: none !important;
+  }
+  /* Print the display face as clean static bold — fall back to
+     font-weight / font-stretch by neutralizing the kinetics. */
+  .display-xl,
+  .display-lg,
+  .display-md {
+    font-variation-settings: normal;
+  }
+  .rv-cast {
+    --fv-wght-cast: 0 !important;
+    --fv-wdth-cast: 0 !important;
+  }
+  .wx-relax {
+    --wdth-scroll: 0 !important;
   }
   a {
     color: #111111;

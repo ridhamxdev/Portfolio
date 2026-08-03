@@ -65,12 +65,16 @@ const FRAG = /* glsl */ `
     vec2 p = vUv * vec2(uAspect, 1.0) * 2.4;
     vec2 pt = (uPointer * 0.5 + 0.5) * vec2(uAspect, 1.0) * 2.4;
 
-    // the pointer presses into the terrain
-    float d = length(p - pt);
-    float press = 0.45 * exp(-d * d * 1.4);
+    // The pointer bends the terrain into a smooth lens. Displacement is the
+    // offset itself times a gaussian falloff, so it vanishes cleanly at the
+    // centre (no normalize() singularity, no starburst) and the deformation
+    // sits exactly under the cursor.
+    vec2 toP = p - pt;
+    float press = exp(-dot(toP, toP) * 1.6);
+    vec2 disp = toP * press * 0.5;
 
-    float n = fbm(p * 1.05 + vec2(uTime * 0.045, -uTime * 0.028) - press * normalize(p - pt + 1e-4));
-    n += uScroll * 0.55 + press * 0.35;
+    float n = fbm(p * 1.05 + vec2(uTime * 0.045, -uTime * 0.028) + disp);
+    n += uScroll * 0.55 + press * 0.3;
 
     float levels = 24.0;
     float t = n * levels;
@@ -149,10 +153,11 @@ function Field({ reduced }: { reduced: boolean }) {
     const tg = target.current;
     const scrollTarget = Math.min(1, Math.max(0, window.scrollY / window.innerHeight));
 
-    const k = 0.08;
-    s.x += (tg.x - s.x) * k;
-    s.y += (tg.y - s.y) * k;
-    s.scroll += (scrollTarget - s.scroll) * k;
+    // Pointer tracks a touch tighter than scroll so the lens sits under the
+    // cursor without feeling laggy; both stay within the house lerp band.
+    s.x += (tg.x - s.x) * 0.12;
+    s.y += (tg.y - s.y) * 0.12;
+    s.scroll += (scrollTarget - s.scroll) * 0.08;
     s.reveal += (tg.reveal - s.reveal) * 0.035;
     if (!reduced) s.t += delta;
 
@@ -200,7 +205,7 @@ export default function ContourField({ className = "" }: { className?: string })
   return (
     <div ref={wrap} className={className} aria-hidden>
       <Canvas
-        dpr={[1, 1.75]}
+        dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         frameloop={reduced ? "demand" : visible ? "always" : "never"}
         style={{ background: "transparent" }}
